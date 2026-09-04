@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الإدارية - لنادي اوتك </title>
+    <!-- استيراد خط Cairo العربي الفخم والرسمي -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- استيراد أيقونات Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;        /* كحلي داكن رسمي */
+            --sky-accent: #0ea5e9;     /* سماوي فخم ونقي */
+            --sky-light: #e0f2fe;      /* خلفية سماوية فاتحة وناعمة */
+            --bg-body: #f8fafc;        /* خلفية عامة هادئة */
+            --card-bg: #ffffff;        /* خلفية بيضاء نقية */
+            --text-main: #1e293b;      /* النصوص الرئيسية */
+            --text-muted: #64748b;     /* النصوص الفرعية */
+            --border: #e2e8f0;         /* حدود ناعمة */
+            --sidebar-width: 260px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* هيكل لوحة التحكم المتطور */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* القائمة الجانبية (Sidebar) على اليمين (للابتوب والشاشات الكبيرة) */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--card-bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            right: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 25px 24px;
+            font-size: 18px;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+        }
+
+        .sidebar-brand span.material-icons-round {
+            color: var(--sky-accent);
+            font-size: 26px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 16px;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu li.active a {
+            background-color: var(--sky-light);
+            color: var(--sky-accent);
+        }
+
+        .sidebar-menu a span {
+            font-size: 20px;
+        }
+
+        /* منطقة المحتوى الرئيسي */
+        main {
+            margin-right: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: calc(100% - var(--sidebar-width));
+            padding-bottom: 40px;
+        }
+
+        /* قسم بيانات المشرف الفخم */
+        .admin-welcome-card {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .admin-welcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .welcome-text h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .welcome-text p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .update-badge {
+            background: var(--sky-light);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: var(--sky-accent);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-refresh {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: var(--sky-accent);
+            transform: rotate(180deg);
+        }
+
+        .admin-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: var(--bg-body);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-box label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .detail-box span {
+            font-size: 15px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* قسم البحث المتقدم وسجل الطلاب */
+        .students-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span.material-icons-round {
+            color: var(--sky-accent);
+        }
+
+        .search-box-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box-container input {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box-container input:focus {
+            border-color: var(--sky-accent);
+        }
+
+        .search-box-container button {
+            background: var(--sky-accent);
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-box-container button:hover {
+            background: #0284c7;
+        }
+
+        /* تصميم فخم لرسالة الخطأ (لم يتم العثور) */
+        #errorAlert {
+            display: none;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            margin-top: 15px;
+            text-align: center;
+            border: 1px solid #fecaca;
+            box-shadow: 0 10px 20px -5px rgba(153, 27, 27, 0.08);
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: fadeInAlert 0.4s ease forwards;
+        }
+
+        /* نتائج البحث وعرض تفاصيل الطالب الديناميكية */
+        #studentResultContainer {
+            display: none;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: var(--card-bg);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .info-item span {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* نموذج إرسال العملية/النقاط للطالب المحدد */
+        .operation-form-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 15px;
+        }
+
+        .operation-form-box h4 {
+            font-size: 15px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--sky-accent);
+        }
+
+        .btn-submit-op {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit-op:hover {
+            background: var(--sky-accent);
+        }
+
+        /* تصميم فخم لرسالة "تم الرصد بنجاح" */
+        #successAlert {
+            display: none;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            margin-top: 18px;
+            text-align: center;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 10px 20px -5px rgba(22, 101, 52, 0.1);
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: fadeInAlert 0.4s ease forwards;
+        }
+
+        @keyframes fadeInAlert {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: var(--bg-body);
+            color: var(--primary);
+            padding: 16px 20px;
+            font-size: 13px;
+            font-weight: 800;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--sky-light);
+        }
+
+        .main-footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            padding-top: 10px;
+            font-weight: 600;
+        }
+
+        /* شريط التنقل السفلي الفخم والمفصول (يظهر فقط في الجوال والشاشات الصغيرة) */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--primary);
+            border-radius: 24px;
+            padding: 12px 20px;
+            box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            z-index: 1000;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item span.material-icons-round {
+            font-size: 22px;
+        }
+
+        .mobile-nav-item:hover, .mobile-nav-item.active {
+            color: var(--sky-accent);
+        }
+
+        /* التجاوب مع الشاشات والهواتف المحمولة */
+        @media (max-width: 900px) {
+            aside {
+                display: none; /* إخفاء القائمة الجانبية في الجوال */
+            }
+            main {
+                margin-right: 0;
+                width: 100%;
+                padding: 15px;
+                padding-bottom: 100px; /* مساحة فارغة لكي لا يغطي الشريط السفلي المحتوى */
+            }
+            .mobile-bottom-nav {
+                display: flex; /* إظهار الشريط السفلي المفصول في الجوال */
+            }
+        }
+
+
+        input, textarea, select {
+                font-size: 16px !important;
+       }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- القائمة الجانبية (Sidebar) على اليمين (للابتوب) -->
+        <aside>
+            <div class="sidebar-brand">
+                <span class="material-icons-round">admin_panel_settings</span>
+                <span>بوابة الإدارة اوتك </span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active">
+                    <a href="#"><span class="material-icons-round">dashboard</span> <span>الرئيسية</span></a>
+                </li>
+                <li>
+                    <a href="jhkj.html"><span class="material-icons-round">settings</span> <span>الإعدادات</span></a>
+                </li>
+                <li>
+                    <a onclick="handleLogout()" style="color: #ef4444;"><span class="material-icons-round">logout</span> <span>تسجيل الخروج</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main>
+            <!-- قسم بيانات المشرف الفخم (في الأعلى) -->
+            <div class="admin-welcome-card">
+                <div class="admin-welcome-header">
+                    <div class="welcome-text">
+                        <h2 id="welcomeMsg">مرحباً بك</h2>
+                        <p>لوحة التحكم الإدارية لنادي اوتك - رسيفر اوتك </p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="update-badge">
+                            <span class="material-icons-round" style="font-size: 16px;">update</span>
+                            <span>آخر تحديث: <span id="lastUpdateTime">--:--:--</span></span>
+                        </div>
+                        <button class="btn-refresh" onclick="refreshData()" title="تحديث البيانات فوراً">
+                            <span class="material-icons-round" style="font-size: 18px;">refresh</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="admin-details-grid">
+                    <div class="detail-box">
+                        <label>الكود التعريفي</label>
+                        <span id="dispCode">-</span>
+                    </div>
+                    <div class="detail-box">
+                        <label>اسم المشرف</label>
+                        <span id="dispName">-</span>
+                    </div>
+                    <div class="detail-box">
+                        <label>المرتبة الإدارية</label>
+                        <span id="dispRank">-</span>
+                    </div>
+                    <div class="detail-box">
+                        <label>المرحلة التعليمية</label>
+                        <span id="dispStage">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم البحث عن الطلاب وسجلهم -->
+            <div class="students-section">
+                <div class="section-title">
+                    <span class="material-icons-round">search</span> بحث وإدارة سجلات الطلاب
+                </div>
+                
+                <!-- صندوق البحث -->
+                <div class="search-box-container">
+                    <input type="text" id="searchInput" placeholder="ابحث باسم الطالب أو الكود..." onkeydown="if(event.key === 'Enter') searchStudentInSheet()">
+                    <button onclick="searchStudentInSheet()">بحث</button>
+                </div>
+
+                <!-- رسالة تنبيه الخطأ الفخمة (عذراً، لم يتم العثور على أي طالب...) -->
+                <div id="errorAlert">
+                    <span class="material-icons-round" style="color: #dc2626; font-size: 20px;">error_outline</span>
+                    <span>عذراً، لم يتم العثور على أي طالب بهذا الاسم أو الكود في الجدول.</span>
+                </div>
+
+                <!-- نتيجة البحث وعرض تفاصيل الطالب ونموذج إرسال العملية -->
+                <div id="studentResultContainer">
+                    <div class="student-info-grid" id="studentInfoGrid">
+                        <!-- يتم تعبئة بيانات الطالب ديناميكياً هنا -->
+                    </div>
+
+                    <!-- نموذج إضافة عملية/نقاط للطالب المحدد -->
+                    <div class="operation-form-box">
+                        <h4>إضافة عملية / نقاط جديدة للطالب</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نوع العملية / الإجراء</label>
+                                <input type="text" id="opName" placeholder="مثال: مشاركة متميزة / تأخير \غياب \ غياب دون عذر \ حضور ">
+                            </div>
+                            <div class="form-group">
+                                <label>التاريخ</label>
+                                <input type="date" id="opDate">
+                            </div>
+                            <div class="form-group">
+                                <label>النقاط</label>
+                                <input type="number" id="opPoints" placeholder="مثال: 5 أو -2">
+                            </div>
+                        </div>
+                        <button class="btn-submit-op" id="submitBtn" onclick="submitOperation()">
+                            <span class="material-icons-round" id="submitBtnIcon">send</span>
+                            <span id="submitBtnText">إرسال العملية إلى النظام</span>
+                        </button>
+                        <div id="successAlert">
+                            <span class="material-icons-round" style="color: #15803d; font-size: 20px;">check_circle</span>
+                            <span>تم الرصد بنجاح! تم اعتماد وإرسال العملية إلى رسيفرات اوتك   .</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- سجل آخر بحث (محفوظ في المتصفح) -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <span class="material-icons-round">history</span> سجل آخر بحث
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم القيد / الكود</th>
+                                <th>اسم الطالب</th>
+                                <th>حالة البحث</th>
+                                <th>وقت الاستعلام</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lastSearchTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted);">لم يتم إجراء أي بحث بعد</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="main-footer">
+                جميع الحقوق محفوظة © منصة اوتك الاصدار 1.0.0  2026
+            </div>
+        </main>
+
+    </div>
+
+    <!-- الشريط السفلي الفخم والمفصول الخاص بالجوال (Mobile Bottom Navbar) -->
+    <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-item active" onclick="refreshData()">
+            <span class="material-icons-round">dashboard</span>
+            <span>الرئيسية</span>
+        </button>
+<button class="mobile-nav-item" onclick="window.location.href='kcsjcd.html';">
+    <span class="material-icons-round">emoji_events</span>
+    <span>الدوري</span>
+</button>
+   <button class="mobile-nav-item" onclick="window.location.href='jhkj.html';">
+    <span class="material-icons-round">settings</span>
+    <span>الإعدادات</span>
+
+        <button class="mobile-nav-item" onclick="handleLogout()" style="color: #fca5a5;">
+            <span class="material-icons-round">logout</span>
+            <span>خروج</span>
+        </button>
+    </nav>
+
+    <script>
+        let currentSupervisor = null;
+        let activeStudentCode = "";
+        let csvHeaders = [];
+
+        // روابط جوجل شيت
+        const studentsCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnq_ryhGDHxZYtbt5gqAXRIo2d0-IuXnD1ZsMlFX9u8AwpbRiLJdcHD5SbmnzXmMLBLr26qCupmGP8/pub?gid=0&single=true&output=csv';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbydnfbBxSHiUgrPSfImfIjYOLm2RsU5qe31E3TKKgmE1RpPduGxAdhieGSWrkTkgkrb/exec';
+
+        function checkAuth() {
+            const data = localStorage.getItem('currentSupervisor');
+            if (!data) {
+                window.location.href = 'hdk.html';
+                return;
+            }
+            currentSupervisor = JSON.parse(data);
+            updateUIWithData();
+            
+            // تعيين تاريخ اليوم افتراضياً في حقل التاريخ
+            const today = new Date().toISOString().split('T')[0];
+            const dateField = document.getElementById('opDate');
+            if (dateField) dateField.value = today;
+
+            // استرجاع وعرض آخر بحث محفوظ في المتصفح تلقائياً عند فتح الصفحة
+            loadLastSearchFromLocalStorage();
+        }
+
+        function updateUIWithData() {
+            if (!currentSupervisor) return;
+
+            document.getElementById('welcomeMsg').textContent = `مرحباً بك، ${currentSupervisor.name}`;
+            document.getElementById('dispCode').textContent = currentSupervisor.code;
+            document.getElementById('dispName').textContent = currentSupervisor.name;
+            document.getElementById('dispRank').textContent = currentSupervisor.rank;
+            document.getElementById('dispStage').textContent = currentSupervisor.stage;
+
+            const now = new Date();
+            document.getElementById('lastUpdateTime').textContent = now.toLocaleTimeString('ar-SA');
+        }
+
+        function refreshData() {
+            updateUIWithData();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentSupervisor');
+            window.location.href = 'hdk.html';
+        }
+
+        // تحليل ملف الـ CSV
+        function parseStudentsCSV(text) {
+            const lines = text.split('\n');
+            const result = [];
+            if (lines.length > 0) {
+                csvHeaders = lines[0].split(',').map(item => item.trim().replace(/^["']|["']$/g, ''));
+            }
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const currentLine = lines[i].split(',').map(item => item.trim().replace(/^["']|["']$/g, ''));
+                if (currentLine.length > 0) {
+                    result.push(currentLine);
+                }
+            }
+            return result;
+        }
+
+        // دالة عرض بيانات الطالب في واجهة النتائج
+        function displayStudentCard(foundRow) {
+            const resultContainer = document.getElementById('studentResultContainer');
+            const infoGrid = document.getElementById('studentInfoGrid');
+
+            activeStudentCode = foundRow[0]; // العمود الأول كود الطالب
+
+            if (infoGrid) {
+                infoGrid.innerHTML = '';
+                foundRow.forEach((value, index) => {
+                    const labelName = csvHeaders[index] || `بيان ${index + 1}`;
+                    infoGrid.innerHTML += `
+                        <div class="info-item">
+                            <label>${labelName}</label>
+                            <span>${value || '-'}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            if (resultContainer) {
+                resultContainer.style.display = 'block';
+            }
+            
+            const successAlert = document.getElementById('successAlert');
+            if (successAlert) {
+                successAlert.style.display = 'none';
+            }
+        }
+
+        // تحميل وحفظ آخر بحث في الـ localStorage
+        function saveLastSearchToLocalStorage(searchData) {
+            localStorage.setItem('adminLastSearch', JSON.stringify(searchData));
+        }
+
+        function loadLastSearchFromLocalStorage() {
+            const saved = localStorage.getItem('adminLastSearch');
+            if (!saved) return;
+            
+            try {
+                const data = JSON.parse(saved);
+                const lastSearchBody = document.getElementById('lastSearchTableBody');
+                
+                if (lastSearchBody) {
+                    if (data.isFound) {
+                        lastSearchBody.innerHTML = `
+                            <tr>
+                                <td><strong>${data.code}</strong></td>
+                                <td>${data.name}</td>
+                                <td><span style="color: #16a34a; font-weight: 700;">تم العثور بنجاح</span></td>
+                                <td>${data.time}</td>
+                            </tr>
+                        `;
+                    } else {
+                        lastSearchBody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #ef4444; font-weight: 700;">
+                                    لم يتم العثور على نتائج للبحث: "${data.query}" (${data.time})
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.error("خطأ في قراءة آخر بحث من المتصفح");
+            }
+        }
+
+        // دالة البحث الشاملة في الجدول
+        async function searchStudentInSheet() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const lastSearchBody = document.getElementById('lastSearchTableBody');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            // إخفاء التنبيهات السابقة عند بدء البحث الجديد
+            if (errorAlert) errorAlert.style.display = 'none';
+            if (successAlert) successAlert.style.display = 'none';
+            
+            if (!query) {
+                if (errorAlert) {
+                    errorAlert.querySelector('span:nth-child(2)').textContent = 'يرجى إدخال اسم الطالب أو الكود للبحث.';
+                    errorAlert.style.display = 'flex';
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch(studentsCSVUrl);
+                const csvText = await response.text();
+                const rows = parseStudentsCSV(csvText);
+
+                const foundRow = rows.find(row => 
+                    row.some(cell => cell.toLowerCase().includes(query))
+                );
+
+                const currentTimeStr = new Date().toLocaleTimeString('ar-SA');
+
+                if (foundRow) {
+                    displayStudentCard(foundRow);
+                    const studentName = foundRow[1] || query;
+
+                    // تحديث الجدول وحفظه في المتصفح
+                    if (lastSearchBody) {
+                        lastSearchBody.innerHTML = `
+                            <tr>
+                                <td><strong>${activeStudentCode}</strong></td>
+                                <td>${studentName}</td>
+                                <td><span style="color: #16a34a; font-weight: 700;">تم العثور بنجاح</span></td>
+                                <td>${currentTimeStr}</td>
+                            </tr>
+                        `;
+                    }
+
+                    saveLastSearchToLocalStorage({
+                        isFound: true,
+                        code: activeStudentCode,
+                        name: studentName,
+                        time: currentTimeStr,
+                        fullRow: foundRow
+                    });
+
+                } else {
+                    // إظهار رسالة الخطأ الفخمة بدلاً من الـ alert التقليدي
+                    const resultContainer = document.getElementById('studentResultContainer');
+                    if (resultContainer) {
+                        resultContainer.style.display = 'none';
+                    }
+
+                    if (errorAlert) {
+                        errorAlert.querySelector('span:nth-child(2)').textContent = 'عذراً، لم يتم العثور على أي طالب بهذا الاسم أو الكود في الجدول.';
+                        errorAlert.style.display = 'flex';
+                    }
+
+                    if (lastSearchBody) {
+                        lastSearchBody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #ef4444; font-weight: 700;">
+                                    لم يتم العثور على نتائج للبحث: "${query}" (${currentTimeStr})
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    saveLastSearchToLocalStorage({
+                        isFound: false,
+                        query: query,
+                        time: currentTimeStr
+                    });
+                }
+            } catch (error) {
+                if (errorAlert) {
+                    errorAlert.querySelector('span:nth-child(2)').textContent = 'حدث خطأ أثناء الاتصال بجدول الطلاب. تأكد من صحة الرابط أو اتصال الإنترنت.';
+                    errorAlert.style.display = 'flex';
+                }
+            }
+        }
+
+        // دالة إرسال العملية/النقاط مع تأثير التحميل الفخم ورسالة "تم الرصد بنجاح"
+        async function submitOperation() {
+            const operationText = document.getElementById('opName').value.trim();
+            const operationDate = document.getElementById('opDate').value;
+            const operationPoints = document.getElementById('opPoints').value.trim();
+            const alertBox = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnIcon = document.getElementById('submitBtnIcon');
+            const btnText = document.getElementById('submitBtnText');
+
+            if (errorAlert) errorAlert.style.display = 'none';
+
+            if (!activeStudentCode) {
+                alert('يرجى تحديد الطالب أولاً عبر البحث في الجدول.');
+                return;
+            }
+
+            if (!operationText || !operationDate || !operationPoints) {
+                alert('يرجى تعبئة كافة حقول العملية والنقاط والتاريخ.');
+                return;
+            }
+
+            // تفعيل حالة التحميل الفخمة والرسمية على الزر
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.8";
+            btnIcon.textContent = "hourglass_top";
+            btnIcon.style.animation = "spin 1.5s linear infinite";
+            btnText.textContent = "جارٍ معالجة ورصد العملية...";
+            if (alertBox) alertBox.style.display = 'none';
+
+            const operationPayload = {
+                studentCode: activeStudentCode,
+                date: operationDate,
+                operation: operationText,
+                points: operationPoints
+            };
+
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(operationPayload)
+                });
+
+                // محاكاة استجابة رسمية فائقة السلاسة
+                setTimeout(() => {
+                    // إعادة الزر لوضعه الطبيعي
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = "1";
+                    btnIcon.textContent = "send";
+                    btnIcon.style.animation = "none";
+                    btnText.textContent = "إرسال العملية إلى النظام";
+
+                    // إظهار رسالة النجاح الفخمة والرسمية
+                    if (alertBox) {
+                        alertBox.style.display = 'flex';
+                    }
+
+                    // تفريغ الحقول بعد النجاح
+                    document.getElementById('opName').value = '';
+                    document.getElementById('opPoints').value = '';
+
+                    // إخفاء الرسالة تلقائياً بعد 5 ثوانٍ بشكل راقي
+                    setTimeout(() => {
+                        if (alertBox) alertBox.style.display = 'none';
+                    }, 5000);
+
+                }, 800);
+
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = "1";
+                btnIcon.textContent = "send";
+                btnIcon.style.animation = "none";
+                btnText.textContent = "إرسال العملية إلى النظام";
+                alert('حدث خطأ أثناء إرسال العملية إلى ورقة العمليات.');
+            }
+        }
+
+        window.onload = checkAuth;
+    </script>
+    
+    <style>
+        /* إضافة حركة دوران لأيقونة التحميل الفخمة */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+</body>
+</html>

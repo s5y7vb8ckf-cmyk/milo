@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم التنفيذية لوتك</title>
+    <!-- استدعاء خط الأيقونات Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --primary: #0f172a;
+            --text-muted: #64748b;
+            --sky-accent: #0ea5e9;
+            --sky-light: rgba(14, 165, 233, 0.1);
+            --success: #10b981;
+            --danger: #ef4444;
+            --sidebar-width: 260px;
+            --shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.08), 0 8px 10px -6px rgba(14, 165, 233, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* القائمة الجانبية (Sidebar) على اليمين (للابتوب والشاشات الكبيرة) */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--card-bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            right: 0;
+            top: 0;
+            z-index: 100;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .sidebar-brand {
+            padding: 25px 24px;
+            font-size: 18px;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+        }
+
+        .sidebar-brand span.material-icons-round {
+            color: var(--sky-accent);
+            font-size: 26px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 16px;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu li.active a {
+            background-color: var(--sky-light);
+            color: var(--sky-accent);
+        }
+
+        .sidebar-menu a span.material-icons-round {
+            font-size: 20px;
+        }
+
+        /* حاوية المحتوى الرئيسي */
+        .main-wrapper {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* الشريط العلوي */
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .admin-badge {
+            background: var(--sky-light);
+            color: var(--sky-accent);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        /* محتوى الصفحة */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-info h3 {
+            font-size: 19px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .card-info p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* حقل الإدخال وزر الحفظ */
+        .text-input-container {
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .text-input-container input {
+            flex: 1;
+            padding: 14px 18px;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--primary);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .text-input-container input:focus {
+            border-color: var(--sky-accent);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+            background-color: #fff;
+        }
+
+        .save-btn {
+            background-color: var(--sky-accent);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .save-btn:hover {
+            background-color: #0284c7;
+        }
+
+        .save-btn:active {
+            transform: scale(0.97);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* زر Uiverse للتبديل */
+        #checkboxInput {
+            display: none;
+        }
+
+        .toggleSwitch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 55px;
+            height: 32px;
+            background-color: #cbd5e1;
+            border-radius: 20px;
+            cursor: pointer;
+            transition-duration: .3s;
+        }
+
+        .toggleSwitch::after {
+            content: "";
+            position: absolute;
+            height: 12px;
+            width: 12px;
+            left: 6px;
+            background-color: transparent;
+            border-radius: 50%;
+            transition-duration: .3s;
+            box-shadow: 3px 2px 5px rgba(0, 0, 0, 0.15);
+            border: 5px solid white;
+        }
+
+        #checkboxInput:checked + .toggleSwitch::after {
+            transform: translateX(100%);
+            transition-duration: .3s;
+            background-color: white;
+        }
+
+        #checkboxInput:checked + .toggleSwitch {
+            background-color: var(--sky-accent);
+            transition-duration: .3s;
+            box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+        }
+
+        #statusMsg {
+            font-size: 13px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* ---------------------------------------------------------------- */
+        /* التعديلات الخاصة بالتجاوب مع الجوال والشاشات الصغيرة */
+        /* ---------------------------------------------------------------- */
+        .mobile-bottom-nav {
+            display: none; /* مخفي افتراضياً على اللابتوب */
+        }
+
+        @media (max-width: 768px) {
+            /* إخفاء القائمة الجانبية القديمة في الجوال */
+            aside {
+                display: none;
+            }
+
+            /* جعل محتوى الصفحة يأخذ عرض الشاشة بالكامل دون هامش جانبي */
+            .main-wrapper {
+                margin-right: 0 !important;
+                padding-bottom: 80px; /* مساحة لكي لا يغطي الشريط السفلي المحتوى */
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .main-container {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            /* إظهار شريط التنقل السفلي الفاخر حصرياً على الجوال */
+            .mobile-bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 12px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92%;
+                max-width: 450px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                justify-content: space-around;
+                align-items: center;
+                padding: 10px 0;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                border: 1px solid var(--border);
+                z-index: 1000;
+                list-style: none;
+            }
+
+            .mobile-nav-item {
+                text-decoration: none;
+                color: var(--text-muted);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 11px;
+                font-weight: 600;
+                gap: 3px;
+                transition: color 0.3s;
+            }
+
+            .mobile-nav-item span.material-icons-round {
+                font-size: 20px;
+            }
+
+            .mobile-nav-item.active, .mobile-nav-item:hover {
+                color: var(--sky-accent);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <!-- الشريط الجانبي (Sidebar) يظهر على اللابتوب ويختفي في الجوال -->
+    <aside>
+        <div class="sidebar-brand">
+            <span class="material-icons-round">admin_panel_settings</span>
+            <span>لوحة الإدارة اوتك</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="dashboar.html"><span class="material-icons-round">dashboard</span> <span>الرئيسية</span></a>
+            </li>
+            <!-- تم نقل الكلاس active إلى الإعدادات -->
+            <li class="active">
+                <a href="hvgjh.html"><span class="material-icons-round">settings</span> <span>الإعدادات</span></a>
+            </li>
+            <li>
+                <a onclick="handleLogout()" style="color: var(--danger);"><span class="material-icons-round">logout</span> <span>تسجيل الخروج</span></a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-wrapper">
+        <!-- الشريط العلوي -->
+        <div class="header">
+            <h1>إدارة النظام اوتك</h1>
+            <div class="admin-badge">مرحبا بك</div>
+        </div>
+
+        <!-- محتوى الصفحة في المنتصف -->
+        <div class="main-container">
+            <div class="content-wrapper">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-info">
+                            <h3>رسائل تحذيرية للطلاب</h3>
+                            <p>عند تفعيله يمكن كتابت رسالة وتكون اما تحذيرية او تذكيرية او تنبيه</p>
+                            <div id="statusMsg"></div>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="checkboxInput">
+                            <label for="checkboxInput" class="toggleSwitch"></label>
+                        </div>
+                    </div>
+
+                    <!-- حقل إدخال النص مع زر الحفظ -->
+                    <div class="text-input-container" id="textContainer">
+                        <div class="input-group">
+                            <input type="text" id="customTextInput" placeholder="أدخل النص المراد إرساله إلى الطلاب">
+                            <button class="save-btn" id="saveBtn">حفظ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شريط التنقل السفلي: يظهر حصرياً على الجوال -->
+    <ul class="mobile-bottom-nav">
+        <li>
+            <a href="dashboar.html" class="mobile-nav-item">
+                <span class="material-icons-round">dashboard</span>
+                <span>الرئيسية</span>
+            </a>
+        </li>
+        <li>
+            <a href="hvgjh.html" class="mobile-nav-item active">
+                <span class="material-icons-round">settings</span>
+                <span>الإعدادات</span>
+            </a>
+        </li>
+        <li>
+            <a onclick="handleLogout()" class="mobile-nav-item" style="color: var(--danger);">
+                <span class="material-icons-round">logout</span>
+                <span>خروج</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- كود الجافاسكريبت للربط -->
+    <script>
+        const checkbox = document.getElementById('checkboxInput');
+        const textContainer = document.getElementById('textContainer');
+        const customTextInput = document.getElementById('customTextInput');
+        const saveBtn = document.getElementById('saveBtn');
+        const statusMsg = document.getElementById('statusMsg');
+
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxFsHE4CxkQe1pOGVtubfP7TrsbkjVSpvfLRXaX9hI47b-G5Bu2ZJ53jgYa8Lf5DyQ6/exec";
+
+        function sendToGoogle(params) {
+            statusMsg.textContent = "";
+            statusMsg.style.color = "#0ea5e9";
+
+            let url = `${WEB_APP_URL}?${params}`;
+
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                    statusMsg.textContent = "";
+                    statusMsg.style.color = "var(--success)";
+                    setTimeout(() => { statusMsg.textContent = ""; }, 3000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusMsg.textContent = "فشل الاتصال بالخادم";
+                    statusMsg.style.color = "var(--danger)";
+                });
+        }
+
+        checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+                textContainer.style.display = "block";
+                sendToGoogle("status=yes");
+            } else {
+                textContainer.style.display = "none";
+                customTextInput.value = "";
+                sendToGoogle("status=no&text=");
+            }
+        });
+
+        saveBtn.addEventListener('click', function() {
+            let textValue = customTextInput.value;
+            sendToGoogle("status=yes&text=" + encodeURIComponent(textValue));
+        });
+
+        customTextInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                let textValue = customTextInput.value;
+                sendToGoogle("status=yes&text=" + encodeURIComponent(textValue));
+            }
+        });
+
+        function handleLogout() {
+            alert("تم تسجيل الخروج بنجاح");
+        }
+    </script>
+</body>
+</html>

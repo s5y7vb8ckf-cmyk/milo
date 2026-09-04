@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول الدوري وإدارته - نادي اوتك</title>
+    <!-- استدعاء خط Cairo الرسمي -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-sky: #0284c7;
+            --light-sky: #e0f2fe;
+            --deep-sky: #0369a1;
+            --pure-white: #ffffff;
+            --soft-bg: #f8fafc;
+            --text-color: #0f172a;
+            --border-sky: #bae6fd;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--soft-bg);
+            color: var(--text-color);
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+
+        .league-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background-color: var(--pure-white);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.08);
+            border: 1px solid var(--border-sky);
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-sky);
+            padding-bottom: 15px;
+        }
+
+        .page-header h1 {
+            font-size: 1.4rem;
+            color: var(--deep-sky);
+            font-weight: 700;
+        }
+
+        .btn-toggle-add {
+            background-color: var(--primary-sky);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-toggle-add:hover {
+            background-color: var(--deep-sky);
+        }
+
+        /* رسالة حالة المزامنة السحابية */
+        .sync-status {
+            background-color: var(--light-sky);
+            color: var(--deep-sky);
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid var(--border-sky);
+        }
+
+        /* نموذج الإضافة والتعديل المخفي افتراضياً */
+        .add-form-container {
+            background-color: var(--soft-bg);
+            border: 1px solid var(--border-sky);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .add-form-container.active {
+            display: block;
+        }
+
+        .add-form-container h3 {
+            font-size: 1.05rem;
+            color: var(--deep-sky);
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-control label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .form-control input {
+            padding: 8px 10px;
+            border: 1px solid var(--border-sky);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            background: white;
+        }
+
+        .form-control input:focus {
+            border-color: var(--primary-sky);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-save {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .btn-cancel {
+            background-color: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* الجدول */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 12px 6px;
+            border-bottom: 1px solid var(--border-sky);
+        }
+
+        th {
+            background-color: var(--light-sky);
+            color: var(--deep-sky);
+            font-weight: 700;
+        }
+
+        td {
+            color: var(--text-color);
+        }
+
+        tr:hover {
+            background-color: var(--soft-bg);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background-color: #fef3c7;
+            color: var(--warning-color);
+            border: none;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            border: none;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* الفوتر */
+        .version-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 0 0 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            border-top: 1px solid var(--border-sky);
+            margin-top: 25px;
+        }
+
+        .version-badge {
+            background-color: var(--light-sky);
+            color: var(--primary-sky);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-sky);
+        }
+
+        /* الشريط السفلي للجوال */
+        .bottom-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                background: #ffffff;
+                justify-content: space-around;
+                align-items: center;
+                padding: 10px;
+                border-top: 1px solid var(--border-sky);
+                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+                z-index: 1000;
+            }
+
+            .bottom-nav-item {
+                text-decoration: none;
+                color: #475569;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: 600;
+                padding: 6px 10px;
+                border-radius: 8px;
+            }
+
+            .bottom-nav-item.active {
+                color: var(--primary-sky);
+            }
+
+            .bottom-nav-item.nav-btn-special {
+                background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+                color: #ffffff !important;
+                border-radius: 10px;
+            }
+
+            .league-container {
+                padding: 15px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+
+
+        
+             input, textarea, select {
+                font-size: 16px !important;
+       }
+    </style>
+</head>
+<body>
+
+    <div class="league-container">
+        <!-- هيدر الصفحة -->
+        <div class="page-header">
+            <h1 id="mainTitle">جدول ترتيب الدوري</h1>
+            <button class="btn-toggle-add" onclick="toggleAddForm()" id="toggleFormBtn">+ إضافة فريق جديد</button>
+        </div>
+
+        <div class="sync-status" id="syncStatus">جاري الاتصال بالخادم السحابي...</div>
+
+        <!-- نموذج الإضافة والتعديل -->
+        <div class="add-form-container" id="formContainer">
+            <h3 id="formSectionTitle">إضافة فريق جديد</h3>
+            <input type="hidden" id="editIndex" value="-1">
+            <div class="form-grid">
+                <div class="form-control">
+                    <label>المجموعة</label>
+                    <input type="text" id="groupInput" placeholder="مثال: الأولى">
+                </div>
+                <div class="form-control">
+                    <label>اسم الفريق</label>
+                    <input type="text" id="teamInput" placeholder="مثال: بيليلا">
+                </div>
+                <div class="form-control">
+                    <label>اللون</label>
+                    <input type="text" id="colorInput" placeholder="مثال: أحمر">
+                </div>
+                <div class="form-control">
+                    <label>لعب</label>
+                    <input type="number" id="playedInput" value="0">
+                </div>
+                <div class="form-control">
+                    <label>فاز</label>
+                    <input type="number" id="wonInput" value="0">
+                </div>
+                <div class="form-control">
+                    <label>تعادل</label>
+                    <input type="number" id="drawnInput" value="0">
+                </div>
+                <div class="form-control">
+                    <label>خسر</label>
+                    <input type="number" id="lostInput" value="0">
+                </div>
+                <div class="form-control">
+                    <label>له</label>
+                    <input type="number" id="goalsForInput" value="0">
+                </div>
+                <div class="form-control">
+                    <label>عليه</label>
+                    <input type="number" id="goalsAgainstInput" value="0">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn-save" id="saveBtn" onclick="saveTeamData()">حفظ وإرسال سحابياً</button>
+                <button class="btn-cancel" onclick="closeForm()">إلغاء</button>
+            </div>
+        </div>
+
+        <!-- جدول الفرق -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المجموعة</th>
+                        <th>الفريق</th>
+                        <th>اللون</th>
+                        <th>لعب</th>
+                        <th>فاز</th>
+                        <th>تعادل</th>
+                        <th>خسر</th>
+                        <th>له</th>
+                        <th>عليه</th>
+                        <th>النقاط</th>
+                        <th>التحكم</th>
+                    </tr>
+                </thead>
+                <tbody id="leagueTableBody">
+                    <!-- سيتم تعبئة البيانات ديناميكياً هنا -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- الفوتر -->
+        <div class="version-footer">
+            <span>نادي اوتك &copy; 2026</span>
+            <span class="version-badge">الإصدار 1.0.0</span>
+        </div>
+    </div>
+
+
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbx6IlbkKG9Nh6yKrzqthU8loDWYpDrFljEZ3LLT9dkjvUSY8L4FSw6qBsLK1KMpCGq7/exec";
+        let leagueData = [];
+
+        // جلب البيانات عند التحميل من السيرفر السحابي أو الذاكرة المحلية
+        async function fetchLeagueData() {
+            const statusEl = document.getElementById('syncStatus');
+            try {
+                const response = await fetch(`${API_URL}?action=getLeague`);
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    leagueData = data;
+                    renderTable();
+                    statusEl.textContent = "تم تحديث البيانات بنجاح من الخادم السحابي ✓";
+                    statusEl.style.backgroundColor = "#f0fdf4";
+                    statusEl.style.color = "#16a34a";
+                }
+            } catch (error) {
+                statusEl.textContent = "تعذر الاتصال بالخادم، يتم عرض البيانات المخزنة محلياً.";
+                statusEl.style.backgroundColor = "#fee2e2";
+                statusEl.style.color = "#dc2626";
+                leagueData = JSON.parse(localStorage.getItem('leagueTeams')) || [];
+                renderTable();
+            }
+        }
+
+        // إرسال البيانات المحدثة للخادم السحابي وللذاكرة المحلية
+        async function syncWithServer() {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.textContent = "جاري الحفظ والتحديث سحابياً...";
+            statusEl.style.backgroundColor = "#e0f2fe";
+            statusEl.style.color = "#0369a1";
+
+            localStorage.setItem('leagueTeams', JSON.stringify(leagueData));
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveLeague', teams: leagueData })
+                });
+                statusEl.textContent = "تم الحفظ والتحديث بنجاح سحابياً ومحلياً ✓";
+                statusEl.style.backgroundColor = "#f0fdf4";
+                statusEl.style.color = "#16a34a";
+            } catch (error) {
+                statusEl.textContent = "تم الحفظ محلياً (تعذر الاتصال الفوري بالخادم السحابي)";
+                statusEl.style.backgroundColor = "#fef3c7";
+                statusEl.style.color = "#d97706";
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('leagueTableBody');
+            tbody.innerHTML = '';
+
+            if (leagueData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="padding: 20px; color: #64748b;">لا توجد فرق مسجلة في الدوري حالياً.</td></tr>`;
+                return;
+            }
+
+            // ترتيب الفرق تنازلياً حسب النقاط
+            leagueData.sort((a, b) => {
+                const pointsA = (Number(a.won) * 3) + (Number(a.drawn) * 1);
+                const pointsB = (Number(b.won) * 3) + (Number(b.drawn) * 1);
+                return pointsB - pointsA;
+            });
+
+            leagueData.forEach((item, index) => {
+                const points = (Number(item.won) * 3) + (Number(item.drawn) * 1);
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.group}</td>
+                        <td><strong>${item.team}</strong></td>
+                        <td>${item.color}</td>
+                        <td>${item.played}</td>
+                        <td>${item.won}</td>
+                        <td>${item.drawn}</td>
+                        <td>${item.lost}</td>
+                        <td>${item.goalsFor}</td>
+                        <td>${item.goalsAgainst}</td>
+                        <td><strong>${points}</strong></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-edit" onclick="editTeam(${index})">تعديل</button>
+                                <button class="btn-delete" onclick="deleteTeam(${index})">حذف</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function toggleAddForm() {
+            const formContainer = document.getElementById('formContainer');
+            formContainer.classList.toggle('active');
+            if(formContainer.classList.contains('active')) {
+                resetFormInputs();
+            }
+        }
+
+        function closeForm() {
+            document.getElementById('formContainer').classList.remove('active');
+            resetFormInputs();
+        }
+
+        function resetFormInputs() {
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('groupInput').value = '';
+            document.getElementById('teamInput').value = '';
+            document.getElementById('colorInput').value = '';
+            document.getElementById('playedInput').value = '0';
+            document.getElementById('wonInput').value = '0';
+            document.getElementById('drawnInput').value = '0';
+            document.getElementById('lostInput').value = '0';
+            document.getElementById('goalsForInput').value = '0';
+            document.getElementById('goalsAgainstInput').value = '0';
+            document.getElementById('formSectionTitle').textContent = 'إضافة فريق جديد';
+            document.getElementById('saveBtn').textContent = 'حفظ وإرسال سحابياً';
+        }
+
+        function saveTeamData() {
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            const group = document.getElementById('groupInput').value.trim();
+            const team = document.getElementById('teamInput').value.trim();
+            const color = document.getElementById('colorInput').value.trim();
+            const played = parseInt(document.getElementById('playedInput').value) || 0;
+            const won = parseInt(document.getElementById('wonInput').value) || 0;
+            const drawn = parseInt(document.getElementById('drawnInput').value) || 0;
+            const lost = parseInt(document.getElementById('lostInput').value) || 0;
+            const goalsFor = parseInt(document.getElementById('goalsForInput').value) || 0;
+            const goalsAgainst = parseInt(document.getElementById('goalsAgainstInput').value) || 0;
+
+            if (!team || !group) {
+                alert('الرجاء إدخال اسم الفريق والمجموعة.');
+                return;
+            }
+
+            const teamObj = { group, team, color, played, won, drawn, lost, goalsFor, goalsAgainst };
+
+            if (editIndex === -1) {
+                leagueData.push(teamObj);
+            } else {
+                leagueData[editIndex] = teamObj;
+            }
+
+            renderTable();
+            syncWithServer();
+            closeForm();
+        }
+
+        function editTeam(index) {
+            const item = leagueData[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('groupInput').value = item.group;
+            document.getElementById('teamInput').value = item.team;
+            document.getElementById('colorInput').value = item.color;
+            document.getElementById('playedInput').value = item.played;
+            document.getElementById('wonInput').value = item.won;
+            document.getElementById('drawnInput').value = item.drawn;
+            document.getElementById('lostInput').value = item.lost;
+            document.getElementById('goalsForInput').value = item.goalsFor;
+            document.getElementById('goalsAgainstInput').value = item.goalsAgainst;
+
+            document.getElementById('formSectionTitle').textContent = 'تعديل بيانات الفريق';
+            document.getElementById('saveBtn').textContent = 'حفظ التعديلات سحابياً';
+            document.getElementById('formContainer').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteTeam(index) {
+            if (confirm('هل أنت متأكد من حذف هذا الفريق نهائياً؟')) {
+                leagueData.splice(index, 1);
+                renderTable();
+                syncWithServer();
+                closeForm();
+            }
+        }
+
+        // جلب البيانات فور تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', fetchLeagueData);
+    </script>
+</body>
+</html>

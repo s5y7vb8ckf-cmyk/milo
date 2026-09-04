@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الرسمية - الطالب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/v2.1.0/uicons-thin-rounded/css/uicons-thin-rounded.css'>
+    <style>
+        :root {
+            --bg-body: #f4f7f6;
+            --surface-white: #ffffff;
+            --primary-sky: #0284c7;
+            --primary-sky-light: #e0f2fe;
+            --primary-sky-dark: #0369a1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* القائمة الجانبية للكمبيوتر (التكاليف بدلاً من الملف، والإعدادات في الأسفل) */
+        .sidebar {
+            width: 280px;
+            background: var(--surface-white);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 35px 24px;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.02);
+        }
+
+        .sidebar-brand h2 {
+            font-size: 20px;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-brand p {
+            font-size: 13px;
+            color: var(--primary-sky);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 40px;
+        }
+
+        .sidebar-menu li, .sidebar-menu a {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .sidebar-menu li.active, .sidebar-menu li:hover, .sidebar-menu a:hover {
+            background: var(--primary-sky-light);
+            color: var(--primary-sky-dark);
+            transform: translateX(-4px);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: 280px;
+            padding: 40px;
+            max-width: calc(100% - 280px);
+        }
+
+        /* البطاقات */
+        .card {
+            background: var(--surface-white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* رأس الصفحة */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            background: var(--surface-white);
+            padding: 20px 30px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .welcome-box h1 {
+            font-size: 22px;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .welcome-box p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        /* شبكة الإحصائيات ودائرة الالتزام */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media(max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .commitment-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* دائرة نسبة الالتزام */
+        .circular-progress {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary-sky) 0deg, #f1f5f9 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            transition: background 1s ease-in-out;
+        }
+
+        .circular-progress::before {
+            content: "";
+            position: absolute;
+            width: 112px;
+            height: 112px;
+            background: var(--surface-white);
+            border-radius: 50%;
+        }
+
+        .progress-value {
+            position: relative;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* بطاقات إحصائيات العمليات */
+        .stats-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .stat-item.highlight-points {
+            background: var(--primary-sky-light);
+            border-color: #bae6fd;
+        }
+
+        .stat-item.highlight-points h3 {
+            color: var(--primary-sky-dark);
+        }
+
+        .stat-item h3 {
+            font-size: 22px;
+            color: var(--primary-sky-dark);
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-item p {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* الجداول */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 700;
+            background: #f8fafc;
+        }
+
+        tr:hover td {
+            background: #fcfdfd;
+        }
+
+        /* الشارات */
+        .badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-حضور { background: #dcfce7; color: #166534; }
+        .badge-غياب { background: #fee2e2; color: #991b1b; }
+        .badge-تأخر { background: #fef9c3; color: #854d0e; }
+        .badge-غياب_بعذر { background: #e0f2fe; color: #0369a1; }
+        .badge-تسميع { background: #f3e8ff; color: #6b21a8; }
+        .badge-إضافة_نقاط { background: #dcfce7; color: #166534; }
+
+        .view-section { display: none; }
+        .view-section.active-view { display: block; animation: fadeIn 0.4s ease; }
+
+        /* الشريط السفلي العائم للجوال بأيقونات Flaticon الرسمية بلون أسود وترتيب الإعدادات أخيرًا */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            justify-content: space-around;
+            padding: 10px 8px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .bottom-nav-item {
+            color: #000000;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            padding: 6px 2px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            text-decoration: none;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary-sky);
+            background: var(--primary-sky-light);
+            font-weight: 700;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            color: #000000;
+            line-height: 1;
+        }
+
+        .bottom-nav-item.active .nav-icon {
+            color: var(--primary-sky);
+        }
+
+        @media(max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-right: 0; max-width: 100%; padding: 20px; padding-bottom: 110px; }
+            .bottom-nav { display: flex; }
+            .stats-cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 6px;
+        }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            border-color: var(--primary-sky);
+            background: #fff;
+        }
+        .btn-primary-custom {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-sky);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary-custom:hover {
+            background: var(--primary-sky-dark);
+        }
+
+
+
+
+
+  input, textarea, select {
+                font-size: 16px !important;
+       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       .btn-fancy-action {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-fancy-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+    background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.version-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem;
+    color: #64748b;
+    border-top: 1px solid #bae6fd;
+    margin-top: 30px;
+    background-color: transparent;
+}
+
+.version-badge {
+    background-color: #e0f2fe;
+    color: #0284c7;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border: 1px solid #bae6fd;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+<!-- تحسين بصري فقط: لا يغيّر أي وظيفة أو رابط أو معرّف في النظام -->
+<style>
+    :root {
+        --bg-body: #f2f7fb;
+        --surface-white: #ffffff;
+        --primary-sky: #0787c9;
+        --primary-sky-light: #e9f7ff;
+        --primary-sky-dark: #075f91;
+        --text-main: #152536;
+        --text-muted: #6b7e90;
+        --border-color: #dce8f0;
+        --shadow-subtle: 0 10px 35px rgba(17, 62, 88, .07);
+        --shadow-hover: 0 18px 42px rgba(2, 132, 199, .13);
+    }
+
+    body {
+        background:
+            radial-gradient(circle at 92% 5%, rgba(56, 189, 248, .11), transparent 27rem),
+            radial-gradient(circle at 5% 92%, rgba(2, 132, 199, .07), transparent 30rem),
+            var(--bg-body);
+    }
+
+    .sidebar {
+        width: 286px;
+        padding: 28px 20px 24px;
+        border-left-color: rgba(220, 232, 240, .9);
+        box-shadow: -12px 0 40px rgba(25, 67, 91, .055);
+        overflow-y: auto;
+    }
+
+    .sidebar-brand {
+        position: relative;
+        padding: 19px 18px 19px 66px;
+        min-height: 67px;
+        border: 1px solid #dcecf5;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #f5fbff, #fff);
+        box-shadow: 0 8px 22px rgba(2, 132, 199, .07);
+    }
+
+    .sidebar-brand::before {
+        content: "أ";
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+        background: linear-gradient(145deg, var(--primary-sky-dark), #14a5e7);
+        box-shadow: 0 8px 18px rgba(2, 132, 199, .23);
+    }
+
+    .sidebar-brand h2 { font-size: 18px; }
+    .sidebar-brand p { font-size: 11px; margin-top: 2px; }
+    .sidebar-menu { margin-top: 27px; }
+
+    .sidebar-menu li,
+    .sidebar-menu a {
+        position: relative;
+        min-height: 49px;
+        padding: 13px 17px;
+        margin-bottom: 7px;
+        border-radius: 14px;
+        border: 1px solid transparent;
+    }
+
+    .sidebar-menu li::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        margin-right: auto;
+        border-radius: 50%;
+        background: #c6d4de;
+        transition: .25s;
+    }
+
+    .sidebar-menu li.active,
+    .sidebar-menu li:hover {
+        transform: translateX(-3px);
+        border-color: #cbeafb;
+        background: linear-gradient(135deg, #eaf8ff, #f7fcff);
+        box-shadow: 0 7px 18px rgba(2, 132, 199, .07);
+    }
+
+    .sidebar-menu li.active::after,
+    .sidebar-menu li:hover::after { background: var(--primary-sky); box-shadow: 0 0 0 5px rgba(2,132,199,.1); }
+
+    .main-content {
+        margin-right: 286px;
+        max-width: calc(100% - 286px);
+        padding: 34px clamp(24px, 3.2vw, 52px) 50px;
+    }
+
+    .header-section {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 26px;
+        padding: 24px 28px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    .header-section::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(var(--primary-sky), #38bdf8);
+    }
+
+    .welcome-box h1 { font-size: clamp(19px, 2vw, 24px); font-weight: 800; letter-spacing: -.4px; }
+
+    .card {
+        border-color: rgba(220, 232, 240, .9);
+        border-radius: 22px;
+        padding: clamp(20px, 2.4vw, 30px);
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    .card:hover { transform: translateY(-2px); border-color: #c7e5f5; }
+    .dashboard-grid { gap: 22px; margin-bottom: 24px; }
+    .commitment-card { background: linear-gradient(160deg, #fff 60%, #f1faff); }
+
+    .circular-progress {
+        width: 148px;
+        height: 148px;
+        box-shadow: 0 10px 28px rgba(2, 132, 199, .12);
+    }
+
+    .circular-progress::before { width: 116px; height: 116px; box-shadow: inset 0 0 0 1px #eef4f7; }
+    .progress-value { font-size: 25px; }
+    .stats-cards-grid { gap: 13px; }
+
+    .stat-item {
+        position: relative;
+        overflow: hidden;
+        min-height: 104px;
+        padding: 20px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 17px;
+        background: linear-gradient(145deg, #fbfdff, #f6fafc);
+        transition: transform .25s, box-shadow .25s, border-color .25s;
+    }
+
+    .stat-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 18px;
+        left: 18px;
+        height: 3px;
+        border-radius: 0 0 6px 6px;
+        background: #cce8f7;
+    }
+
+    .stat-item:hover { transform: translateY(-3px); border-color: #bcdff2; box-shadow: 0 10px 22px rgba(2,132,199,.09); }
+    .stat-item.highlight-points { background: linear-gradient(145deg, #e5f6ff, #f5fbff); box-shadow: inset 0 0 0 1px rgba(2,132,199,.04); }
+    .stat-item.highlight-points::before { background: var(--primary-sky); }
+    .stat-item h3 { font-size: 25px; letter-spacing: -.5px; }
+
+    .table-container {
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #aedbf1 transparent;
+    }
+
+    table { min-width: 570px; }
+    th, td { padding: 15px 18px; }
+    th { background: #f4f9fc; color: #496276; font-size: 12px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tr:hover td { background: #f7fcff; }
+    .badge { border: 1px solid rgba(0,0,0,.04); padding: 6px 13px; }
+
+    .form-control {
+        min-height: 50px;
+        padding: 12px 15px;
+        border-radius: 13px;
+        background: #f8fbfd;
+    }
+
+    .form-control:focus { box-shadow: 0 0 0 4px rgba(2,132,199,.1); }
+    .btn-primary-custom, .btn-fancy-action { border-radius: 13px; min-height: 48px; box-shadow: 0 9px 20px rgba(2,132,199,.18); }
+
+    .persistent-warning-banner {
+        border-radius: 17px !important;
+        box-shadow: 0 10px 25px rgba(239,68,68,.08) !important;
+    }
+
+    .version-footer { border-top-color: #dcebf4; }
+
+    @media (max-width: 768px) {
+        body { background: linear-gradient(180deg, #eef8fd 0, #f7fafc 210px, #f4f7f9 100%); }
+        .main-content { margin-right: 0; max-width: 100%; padding: 16px 14px calc(105px + env(safe-area-inset-bottom)); }
+        .header-section { padding: 19px 18px; border-radius: 18px; margin-bottom: 17px; gap: 7px; }
+        .header-section > div:last-child { padding: 5px 10px; background: #f3f8fb; border-radius: 9px; }
+        .dashboard-grid { gap: 14px; margin-bottom: 14px; }
+        .card { padding: 20px 16px; border-radius: 19px; margin-bottom: 14px; }
+        .commitment-card { padding-block: 25px; }
+        .circular-progress { width: 132px; height: 132px; }
+        .circular-progress::before { width: 103px; height: 103px; }
+        .stats-cards-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+        .stat-item { min-height: 96px; padding: 16px 8px; }
+        .stat-item h3 { font-size: 22px; }
+        .stat-item p { font-size: 11px; }
+        .table-container { margin-top: 15px; border-radius: 14px; }
+        .bottom-nav {
+            left: 12px;
+            right: 12px;
+            bottom: max(12px, env(safe-area-inset-bottom));
+            padding: 8px 6px;
+            border-radius: 21px;
+            border-color: rgba(195,216,228,.9);
+            box-shadow: 0 15px 38px rgba(20,57,77,.17);
+        }
+        .bottom-nav-item { min-width: 0; padding: 7px 1px; border-radius: 14px; }
+        .bottom-nav-item span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-icon { font-size: 20px; }
+        .bottom-nav-item.active { box-shadow: inset 0 0 0 1px rgba(2,132,199,.08); }
+    }
+
+    @media (max-width: 380px) {
+        .stats-cards-grid { gap: 8px; }
+        .bottom-nav-item { font-size: 9px; }
+        .nav-icon { font-size: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+</style>
+<!-- ضبط إضافي لترتيب الواجهة وتوحيد المسافات -->
+<style>
+    .sidebar-brand { padding: 19px 66px 19px 18px; }
+
+    .main-content {
+        width: calc(100% - 286px);
+    }
+
+    .main-content > * {
+        width: 100%;
+        max-width: 1240px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .header-section {
+        min-height: 92px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: minmax(265px, .72fr) minmax(560px, 1.7fr);
+        align-items: stretch;
+    }
+
+    .dashboard-grid > .card {
+        height: 100%;
+        margin-bottom: 0;
+    }
+
+    .stats-cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        height: calc(100% - 42px);
+        align-content: stretch;
+    }
+
+    .stat-item {
+        min-height: 112px;
+    }
+
+    .view-section > .card:last-child {
+        margin-bottom: 0;
+    }
+
+    .card > h3:first-child {
+        line-height: 1.6;
+    }
+
+    .card > p {
+        line-height: 1.8;
+    }
+
+    .table-container {
+        background: #fff;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        white-space: nowrap;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        min-width: 74px;
+        text-align: center;
+    }
+
+    #settings-view .card {
+        max-width: 900px;
+        margin-inline: auto;
+    }
+
+    #settings-view .form-group {
+        margin-bottom: 18px;
+    }
+
+    .sidebar > div:last-child {
+        display: grid;
+        gap: 10px;
+    }
+
+    .sidebar > div:last-child .btn-fancy-action,
+    .sidebar > div:last-child button {
+        margin: 0 !important;
+        min-height: 46px;
+        font-family: 'Cairo', sans-serif;
+    }
+
+    .menu-icon,
+    .action-icon,
+    .nav-icon {
+        width: 21px;
+        height: 21px;
+        flex: 0 0 21px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .sidebar-menu li::after { display: none; }
+
+    .sidebar-menu li,
+    .sidebar-menu a {
+        gap: 13px;
+    }
+
+    .sidebar-menu .menu-icon {
+        padding: 1px;
+        color: #718697;
+        transition: color .25s, transform .25s;
+    }
+
+    .sidebar-menu li.active .menu-icon,
+    .sidebar-menu li:hover .menu-icon,
+    .sidebar-menu a:hover .menu-icon {
+        color: var(--primary-sky);
+        transform: scale(1.06);
+    }
+
+    .sidebar-menu a {
+        padding: 0;
+        margin: 0;
+    }
+
+    .action-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+    }
+
+    .bottom-nav .nav-icon {
+        width: 21px;
+        height: 21px;
+        color: #536a7a;
+        stroke-width: 1.8;
+        transition: color .25s, transform .25s;
+    }
+
+    .bottom-nav-item.active .nav-icon {
+        color: var(--primary-sky);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 1120px) and (min-width: 769px) {
+        .sidebar { width: 250px; padding-inline: 16px; }
+        .main-content { margin-right: 250px; width: calc(100% - 250px); max-width: calc(100% - 250px); padding-inline: 24px; }
+        .dashboard-grid { grid-template-columns: 1fr; }
+        .dashboard-grid > .card { height: auto; }
+        .stats-cards-grid { height: auto; }
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            width: 100%;
+        }
+
+        .main-content > * {
+            max-width: 580px;
+        }
+
+        .header-section {
+            min-height: auto;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-grid > .card {
+            height: auto;
+        }
+
+        .stats-cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            height: auto;
+        }
+
+        .stat-item {
+            min-height: 98px;
+        }
+
+        .card > h3:first-child {
+            font-size: 16px !important;
+        }
+    }
+
+    @media (max-width: 430px) {
+        .header-section {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .welcome-box p {
+            font-size: 12px;
+        }
+
+        .stats-cards-grid {
+            gap: 9px;
+        }
+
+        .stat-item {
+            min-height: 92px;
+            border-radius: 15px;
+        }
+    }
+</style>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<style>
+/* نظام بطاقات النقاط */
+.reward-scan-card{max-width:760px;margin-inline:auto}
+.reward-scan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.reward-scan-head h3{font-size:19px;color:var(--text-main);margin-bottom:5px}
+.reward-scan-head p{font-size:13px;color:var(--text-muted);line-height:1.8}
+.reward-camera-box{background:#f8fbfd;border:1px solid var(--border-color);border-radius:18px;padding:14px;overflow:hidden}
+#rewardReader{width:100%;min-height:240px;background:#fff;border-radius:14px;overflow:hidden}
+.reward-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.reward-btn{min-height:46px;border:0;border-radius:12px;padding:10px 18px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer}
+.reward-btn.primary{background:var(--primary-sky);color:#fff}
+.reward-btn.secondary{background:#eef5f8;color:var(--text-main);border:1px solid var(--border-color)}
+.reward-result{display:none;margin-top:16px;padding:16px 18px;border-radius:14px;font-size:14px;font-weight:700;line-height:1.8}
+.reward-result.show{display:block}
+.reward-result.success{background:#ecfdf5;color:#166534;border:1px solid #bbf7d0}
+.reward-result.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.reward-result.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.reward-manual{display:flex;gap:10px;margin-top:14px}
+.reward-manual input{flex:1;min-width:0;min-height:48px;border:1px solid var(--border-color);border-radius:12px;padding:10px 13px;font-size:16px}
+@media(max-width:600px){
+  .reward-scan-head{flex-direction:column}
+  .reward-manual{flex-direction:column}
+  .reward-btn{width:100%}
+}
+</style>
+
+</head>
+<body>
+
+    <!-- القائمة الجانبية للكمبيوتر (التكاليف بدلاً من الملف، والإعدادات في الأسفل) -->
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <h2>نادي اوتك</h2>
+                <p>لوحة الطالب الرسمية</p>
+                </div>
+           <ul class="sidebar-menu">
+                <li class="active" onclick="switchView('home', this)"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3l8.5 7.5"/><path d="M5.5 9.5V21h13V9.5M9.5 21v-6h5v6"/></svg><span>الرئيسية</span></li>
+                <li onclick="switchView('attendance', this)"><svg class="menu-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16m-11 5 2 2 4-4"/></svg><span>سجل الحضور والغياب</span></li>
+                <li onclick="switchView('statement', this)"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>كشف الحساب</span></li>
+                <li>
+  <a href="kddk.html" style="text-decoration: none; color: inherit; display: block; width: 100%; height: 100%;">
+     <svg class="menu-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 2v4M16 2v4M8 10h8M8 14h5"/></svg><span>التكاليف</span>
+  </a>
+</li>
+
+                <li onclick="switchView('rewardscan', this)"><svg class="menu-icon" viewBox="0 0 24 24"><path d="M4 5v4M4 5h4M20 5v4M20 5h-4M4 19v-4M4 19h4M20 19v-4M20 19h-4"/><path d="M8 9v6M11 9v6M14 9v6M17 9v6"/></svg><span>مسح بطاقة نقاط</span></li>
+                <li onclick="switchView('settings', this)"><svg class="menu-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg><span>الإعدادات</span></li>
+
+
+            </ul>
+        </div>
+        <div>
+<a href="mxbmn.html" class="btn-fancy-action" style="text-decoration: none;">
+    <svg class="action-icon" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v3a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a4 4 0 0 0 4 4M17 6h3v1a4 4 0 0 1-4 4"/></svg><span>الدوري</span>
+</a>
+            <button onclick="logout()" style="width:100%; padding:12px; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; border-radius:12px; cursor:pointer; font-weight:700; font-size:14px; transition:0.3s;">تسجيل الخروج</button>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        
+        <div class="header-section">
+            <div class="welcome-box">
+                <h1 id="studentName">مرحباً، جاري التحميل...</h1>
+                <p>المجموعة: <span id="studentGroup" class="skeleton" style="display:inline-block; width:50px; height:14px; vertical-align:middle;"></span></p>
+            </div>
+            <div>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">آخر تحديث: <span id="lastUpdate">الآن</span></span>
+            </div>
+        </div>
+
+
+
+
+
+
+<!-- ضع هذا الستايل (CSS) في قسم head لديك -->
+<style>
+    /* تنسيق البانر الثابت والبارز */
+    .persistent-warning-banner {
+        width: 100%;
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        border-right: 5px solid #ef4444;
+        padding: 20px 24px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+        display: none; /* مخفي افتراضياً حتى يوجد نص في B2 */
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+        animation: fadeInBanner 0.4s ease;
+    }
+
+    .persistent-warning-banner.active {
+        display: flex;
+    }
+
+    .warning-banner-icon {
+        color: #ef4444;
+        font-size: 32px;
+        flex-shrink: 0;
+    }
+
+    .warning-banner-content h4 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #991b1b;
+        margin-bottom: 4px;
+    }
+
+    .warning-banner-content p {
+        font-size: 14px;
+        color: #b91c1c;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    @keyframes fadeInBanner {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* دعم الشاشات الصغيرة والجوال */
+    @media (max-width: 768px) {
+        .persistent-warning-banner {
+            padding: 15px 18px;
+            gap: 12px;
+        }
+        .warning-banner-icon {
+            font-size: 28px;
+        }
+        .warning-banner-content h4 {
+            font-size: 15px;
+        }
+        .warning-banner-content p {
+            font-size: 13px;
+        }
+    }
+</style>
+
+<!-- ضع هذا العنصر (HTML) في المكان الذي تريد ظهور البانر فيه داخل صفحتك -->
+<div class="persistent-warning-banner" id="warningBanner">
+    <span class="material-icons-round warning-banner-icon">تنبيه</span>
+    <div class="warning-banner-content">
+        <h4></h4>
+        <p id="warningBannerText">جاري تحميل البيانات...</p>
+    </div>
+</div>
+
+<!-- ضع هذا الكود (JavaScript) مع كود الجافاسكريبت لديك -->
+<script>
+    const warningBanner = document.getElementById('warningBanner');
+    const warningBannerText = document.getElementById('warningBannerText');
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7hDBuMhs4jzcpy1yiGfb4VAA5wKcoxuqPtysFbTamXODq_NhMgbI9HCDI9tCV3Yk5sDTQn10TBkZ6/pub?gid=0&single=true&output=csv";
+
+    // دالة التحقق المستمر من الخلية B2
+    function checkCellB2Status() {
+        fetch(CSV_URL + "&t=" + new Date().getTime())
+            .then(response => response.text())
+            .then(csvText => {
+                const rows = parseCSV(csvText);
+                if (rows && rows.length > 1 && rows[1].length > 1) {
+                    let cellB2Value = rows[1][1] ? rows[1][1].trim() : "";
+
+                    if (cellB2Value !== "" && cellB2Value !== "-") {
+                        warningBannerText.textContent = cellB2Value;
+                        warningBanner.classList.add('active');
+                    } else {
+                        warningBanner.classList.remove('active');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("خطأ في جلب بيانات البانر:", error);
+            });
+    }
+
+    // دالة مساعدة لفك تشفير CSV بدقة
+    function parseCSV(str) {
+        let arr = [];
+        let row = [];
+        let inQuotes = false;
+        let c, r, s;
+        
+        for (let i = 0; i < str.length; i++) {
+            c = str[i];
+            r = str[i+1];
+            
+            if (c === '"' && inQuotes && r === '"') {
+                s += '"';
+                i++;
+                continue;
+            }
+            if (c === '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+            if (c === ',' && !inQuotes) {
+                row.push(s !== undefined ? s : "");
+                s = undefined;
+                continue;
+            }
+            if ((c === '\r' && r === '\n') && !inQuotes) {
+                row.push(s !== undefined ? s : "");
+                arr.push(row);
+                row = [];
+                s = undefined;
+                i++;
+                continue;
+            }
+            if (c === '\n' && !inQuotes) {
+                row.push(s !== undefined ? s : "");
+                arr.push(row);
+                row = [];
+                s = undefined;
+                continue;
+            }
+            s = (s !== undefined ? s : "") + c;
+        }
+        if (s !== undefined) row.push(s);
+        arr.push(row);
+        return arr;
+    }
+
+    // تشغيل الفحص فوراً ثم تكراره كل ثانية واحدة (1000 مللي ثانية)
+    checkCellB2Status();
+    setInterval(checkCellB2Status, 1000);
+</script>
+
+
+
+
+
+
+
+
+
+
+        <!-- 1. قسم الرئيسية -->
+        <div id="home-view" class="view-section active-view">
+            <div class="dashboard-grid">
+                <div class="card commitment-card">
+                    <h3 style="margin-bottom: 15px; font-size:16px; color:var(--text-main); font-weight:700;">مؤشر نسبة الالتزام</h3>
+                    <div class="circular-progress" id="circularProgress">
+                        <div class="progress-value" id="progressVal">0%</div>
+                    </div>
+                    <p id="commitmentText" style="font-size: 13px; color: var(--text-muted); font-weight: 600;"></p>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; font-size:16px; color:var(--text-main); font-weight:700;">ملخص الإحصائيات والنقاط</h3>
+                    <div class="stats-cards-grid">
+                        <div class="stat-item highlight-points">
+                            <h3 id="statTotalPoints">0</h3>
+                            <p>إجمالي النقاط</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="statAttendance">0</h3>
+                            <p>حضور</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="statAbsence">0</h3>
+                            <p>غياب</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="statLate">0</h3>
+                            <p>تأخر</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="statRecitation">0</h3>
+                            <p>تسميع</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3 id="statTotalOps">0</h3>
+                            <p>إجمالي العمليات</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--text-main); font-weight:700;">آخر الأنشطة والعمليات</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>العملية</th>
+                                <th>النقاط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="operationsTableBody">
+                            <tr><td colspan="3" style="text-align: center; color:var(--text-muted);">جاري تحميل البيانات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. قسم سجل الحضور والغياب -->
+        <div id="attendance-view" class="view-section">
+            <div class="card">
+                <h3 style="margin-bottom: 8px; font-size:18px; color:var(--text-main); font-weight:700;">سجل الحضور والغياب والانضباط</h3>
+                <p style="color:var(--text-muted); font-size:13px; margin-bottom: 25px;">متابعة تفصيلية لحالات الحضور، الغياب، التأخر، والغياب بعذر.</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الحالة الانتظامية</th>
+                                <th>النقاط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <tr><td colspan="3" style="text-align: center; color:var(--text-muted);">جاري تحميل السجلات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. قسم كشف الحساب -->
+        <div id="statement-view" class="view-section">
+            <div class="card">
+                <h3 style="margin-bottom: 8px; font-size:18px; color:var(--text-main); font-weight:700;">كشف الحساب وسجل النقاط الشامل</h3>
+                <p style="color:var(--text-muted); font-size:13px; margin-bottom: 25px;">عرض كافة العمليات والنقاط المسجلة في السجل الإلكتروني.</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>العملية</th>
+                                <th>النقاط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fullOperationsTableBody">
+                            <tr><td colspan="3" style="text-align: center; color:var(--text-muted);">جاري تحميل كشف الحساب...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- قسم مسح بطاقة النقاط -->
+        <div id="rewardscan-view" class="view-section">
+            <div class="card reward-scan-card">
+                <div class="reward-scan-head">
+                    <div>
+                        <h3>مسح بطاقة النقاط</h3>
+                        <p>وجّه الكاميرا إلى باركود البطاقة. إذا كانت البطاقة متاحة ستُضاف نقاطها لحسابك ثم تُقفل نهائياً بعد أول استخدام.</p>
+                    </div>
+                </div>
+
+                <div class="reward-camera-box">
+                    <div id="rewardReader"></div>
+                    <div class="reward-actions">
+                        <button type="button" class="reward-btn primary" id="startRewardScanBtn">تشغيل الكاميرا</button>
+                        <button type="button" class="reward-btn secondary" id="stopRewardScanBtn">إيقاف الكاميرا</button>
+                    </div>
+                    <div class="reward-manual">
+                        <input id="rewardManualCode" type="text" inputmode="text" autocomplete="off" placeholder="أو اكتب كود البطاقة">
+                        <button type="button" class="reward-btn primary" id="redeemManualBtn">استخدام البطاقة</button>
+                    </div>
+                </div>
+
+                <div id="rewardScanResult" class="reward-result" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <!-- 4. قسم الإعدادات -->
+        <div id="settings-view" class="view-section">
+            <div class="card" style="max-width: 550px;">
+                <h3 style="margin-bottom: 25px; font-size:18px; color:var(--text-main); font-weight:700;">بيانات الحساب الشخصي</h3>
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                    <p style="color:var(--text-muted); font-size:13px; font-weight:500;">الاسم الكامل</p>
+                    <p id="settingsName" style="font-weight:700; font-size:16px; color:var(--text-main); margin-top: 4px;"></p>
+                </div>
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                    <p style="color:var(--text-muted); font-size:13px; font-weight:500;">كود الطالب</p>
+                    <p id="settingsCode" style="font-weight:700; font-size:16px; color:var(--text-main); margin-top: 4px;"></p>
+                </div>
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                    <p style="color:var(--text-muted); font-size:13px; font-weight:500;">المجموعة القرآنية</p>
+                    <p id="settingsGroup" style="font-weight:700; font-size:16px; color:var(--text-main); margin-top: 4px;"></p>
+                </div>
+                <div style="margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                    <p style="color:var(--text-muted); font-size:13px; font-weight:500;">إجمالي النقاط</p>
+                    <p id="settingsPoints" style="font-weight:800; font-size:18px; color:var(--primary-sky); margin-top: 4px;"></p>
+                </div>
+
+                <div class="settings-card" style="margin-bottom: 25px;">
+                    <div class="settings-header" style="margin-bottom: 15px;">
+                        <h3 style="font-size: 16px; font-weight: 700;">إعدادات الحساب</h3>
+                        <p style="font-size: 13px; color: var(--text-muted);">تغيير كلمة السر الخاصة بحسابك الرسمي</p>
+                    </div>
+
+                    <form id="changePasswordForm" onsubmit="updatePassword(event)">
+                        <div class="form-group">
+                            <label for="currentPass">كلمة السر الحالية</label>
+                            <input type="password" id="currentPass" class="form-control" placeholder="أدخل كلمة السر الحالية" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPass">كلمة السر الجديدة</label>
+                            <input type="password" id="newPass" class="form-control" placeholder="أدخل كلمة السر الجديدة" required>
+                        </div>
+
+                        <button type="submit" id="saveBtn" class="btn-primary-custom">حفظ التغييرات</button>
+                    </form>
+
+                    <div id="settingsAlert" class="alert-message" style="display: none; margin-top: 15px; padding: 10px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 13px;"></div>
+                </div>
+
+                <button onclick="logout()" style="width:100%; padding:14px; background:#fee2e2; border:1px solid #fecaca; color:#991b1b; border-radius:12px; cursor:pointer; font-weight:700; font-size:15px; transition:0.3s;">تسجيل الخروج وحذف البيانات المحلية</button>
+            </div>
+            <div class="version-footer">
+    <span>نادي اوتك &copy; 2026</span>
+    <span class="version-badge">الإصدار 1.0.0</span>
+</div>
+        </div>
+
+    </div>
+
+<!-- الشريط السفلي العائم للجوال (مدمج به الزر الجديد) -->
+    <div class="bottom-nav">
+        <div class="bottom-nav-item active" onclick="switchViewMobile('home', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3l8.5 7.5"/><path d="M5.5 9.5V21h13V9.5M9.5 21v-6h5v6"/></svg>
+            <span>الرئيسية</span>
+        </div>
+        
+        <div class="bottom-nav-item" onclick="switchViewMobile('attendance', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16m-11 5 2 2 4-4"/></svg>
+            <span>الحضور</span>
+        </div>
+        
+        <div class="bottom-nav-item" onclick="switchViewMobile('statement', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+            <span>الحساب</span>
+        </div>
+  <a href="mxbmn.html" class="bottom-nav-item nav-btn-special" style="text-decoration: none;">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v3a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a4 4 0 0 0 4 4M17 6h3v1a4 4 0 0 1-4 4"/></svg>
+    <span>الدوري</span>
+</a>
+        <div class="bottom-nav-item" onclick="switchViewMobile('rewardscan', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5v4M4 5h4M20 5v4M20 5h-4M4 19v-4M4 19h4M20 19v-4M20 19h-4"/><path d="M8 9v6M11 9v6M14 9v6M17 9v6"/></svg>
+            <span>البطاقة</span>
+        </div>
+        <div class="bottom-nav-item" onclick="switchViewMobile('settings', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 14.5l2 1.5-2 3-2.3-1a8 8 0 0 1-2.2 1.2L14 22h-4l-.5-2.8A8 8 0 0 1 7.3 18L5 19l-2-3 2-1.5a8 8 0 0 1 0-5L3 8l2-3 2.3 1a8 8 0 0 1 2.2-1.2L10 2h4l.5 2.8A8 8 0 0 1 16.7 6L19 5l2 3-2 1.5a8 8 0 0 1 0 5z"/></svg>
+            <span>الإعدادات</span>
+        </div>
+    </div>
+    <script>
+        const webAppURL = 'https://script.google.com/macros/s/AKfycbwcijMSIidqnYTVYDkY_JLNbispsjII9gUviG6C3BasGvKPXKdXZlukBE-V9Vjgr4MR/exec';
+
+        // ضع هنا نفس رابط نشر Google Apps Script المستخدم في ملف Code.gs المرفق.
+        const rewardCardsWebAppURL = 'https://script.google.com/macros/s/AKfycbwcijMSIidqnYTVYDkY_JLNbispsjII9gUviG6C3BasGvKPXKdXZlukBE-V9Vjgr4MR/exec';
+        let rewardScanner = null;
+        let rewardScannerRunning = false;
+        let rewardRedeeming = false;
+
+        const operationsSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnq_ryhGDHxZYtbt5gqAXRIo2d0-IuXnD1ZsMlFX9u8AwpbRiLJdcHD5SbmnzXmMLBLr26qCupmGP8/pub?gid=1214163216&single=true&output=csv';
+
+        const student = JSON.parse(localStorage.getItem('studentData'));
+
+        if (!student) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('studentName').innerText = `مرحباً، ${student.name}`;
+            document.getElementById('studentGroup').innerText = student.group;
+            document.getElementById('studentGroup').classList.remove('skeleton');
+            
+            document.getElementById('statTotalPoints').innerText = student.points || '0';
+            document.getElementById('settingsPoints').innerText = student.points || '0';
+
+            document.getElementById('settingsName').innerText = student.name;
+            document.getElementById('settingsCode').innerText = student.code;
+            document.getElementById('settingsGroup').innerText = student.group;
+
+            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
+
+            setupCommitment(parseFloat(student.commitment) || 0);
+            fetchOperations(student.code);
+        }
+
+        function setupCommitment(percentage) {
+            const progressVal = document.getElementById('progressVal');
+            const circularProgress = document.getElementById('circularProgress');
+            const commitmentText = document.getElementById('commitmentText');
+
+            progressVal.innerText = `${percentage}%`;
+
+            let color = '#0284c7';
+            if (percentage >= 80) {
+                color = '#16a34a';
+                commitmentText.innerText = 'مستوى التزام ممتاز ومستقر';
+            } else if (percentage >= 50) {
+                color = '#0284c7';
+                commitmentText.innerText = 'مستوى التزام جيد، يحتاج حرص';
+            } else {
+                color = '#dc2626';
+                commitmentText.innerText = 'مستوى الالتزام منخفض';
+            }
+
+            const degree = (percentage / 100) * 360;
+            circularProgress.style.background = `conic-gradient(${color} ${degree}deg, #f1f5f9 0deg)`;
+        }
+
+        async function fetchOperations(studentCode) {
+            try {
+                const response = await fetch(operationsSheetURL);
+                const data = await response.text();
+                const rows = data.split('\n').map(row => row.split(',').map(item => item.trim().replace(/^"|"$/g, '')));
+                
+                let studentOps = [];
+                let attendanceOps = [];
+
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (row.length >= 4 && row[0] === studentCode) {
+                        const opData = {
+                            date: row[1],
+                            operation: row[2],
+                            points: row[3]
+                        };
+                        studentOps.push(opData);
+
+                        if (['حضور', 'غياب', 'تأخر', 'غياب بعذر'].includes(opData.operation.trim())) {
+                            attendanceOps.push(opData);
+                        }
+                    }
+                }
+
+                let stats = { حضور: 0, غياب: 0, تأخر: 0, 'غياب بعذر': 0, تسميع: 0, إجمالي: studentOps.length };
+                
+                studentOps.forEach(op => {
+                    let opName = op.operation.trim();
+                    if (stats[opName] !== undefined) {
+                        stats[opName]++;
+                    }
+                });
+
+                document.getElementById('statAttendance').innerText = stats['حضور'] || 0;
+                document.getElementById('statAbsence').innerText = stats['غياب'] || 0;
+                document.getElementById('statLate').innerText = stats['تأخر'] || 0;
+                document.getElementById('statRecitation').innerText = stats['تسميع'] || 0;
+                document.getElementById('statTotalOps').innerText = stats.إجمالي;
+
+                populateTable('operationsTableBody', studentOps.slice(0, 5));
+                populateTable('attendanceTableBody', attendanceOps);
+                populateTable('fullOperationsTableBody', studentOps);
+
+            } catch (err) {
+                console.error("خطأ في جلب السجلات", err);
+            }
+        }
+
+        function populateTable(tableBodyId, ops) {
+            const tbody = document.getElementById(tableBodyId);
+            if (ops.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color:var(--text-muted);">لا توجد سجلات مطابقة حتى الآن</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            ops.forEach(op => {
+                let badgeStyleClass = 'badge ';
+                let opName = op.operation.trim();
+                if(opName === 'حضور') badgeStyleClass += 'badge-حضور';
+                else if(opName === 'غياب') badgeStyleClass += 'badge-غياب';
+                else if(opName === 'تأخر') badgeStyleClass += 'badge-تأخر';
+                else if(opName === 'غياب بعذر') badgeStyleClass += 'badge-غياب_بعذر';
+                else if(opName === 'تسميع') badgeStyleClass += 'badge-تسميع';
+                else badgeStyleClass += 'badge-إضافة_نقاط';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${op.date}</td>
+                    <td><span class="${badgeStyleClass}">${op.operation}</span></td>
+                    <td style="font-weight: 700;">${op.points}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchView(viewName, el) {
+            if (viewName !== 'rewardscan') stopRewardScanner();
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById(`${viewName}-view`).classList.add('active-view');
+            if(el) el.classList.add('active');
+
+            const menuItems = document.querySelectorAll('.sidebar-menu li');
+            const map = { 'home': 0, 'attendance': 1, 'statement': 2, 'rewardscan': 4, 'settings': 5 };
+            if (map[viewName] !== undefined && menuItems[map[viewName]]) {
+                menuItems[map[viewName]].classList.add('active');
+            }
+            
+            const navItems = document.querySelectorAll('.bottom-nav-item');
+            const mobileMap = { 'home': 0, 'attendance': 1, 'statement': 2, 'rewardscan': 4, 'settings': 5 };
+            if (mobileMap[viewName] !== undefined && navItems[mobileMap[viewName]]) {
+                navItems[mobileMap[viewName]].classList.add('active');
+            }
+        }
+
+        function switchViewMobile(viewName, el) {
+            switchView(viewName, el);
+        }
+
+
+        function rewardJsonp(params) {
+            return new Promise((resolve, reject) => {
+                if (!rewardCardsWebAppURL || rewardCardsWebAppURL.includes('YOUR_GOOGLE')) {
+                    reject(new Error('لم يتم وضع رابط Google Apps Script بعد'));
+                    return;
+                }
+                const callbackName = '__reward_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                const script = document.createElement('script');
+                const query = new URLSearchParams({...params, callback: callbackName, _: Date.now()});
+                let timer;
+
+                window[callbackName] = (data) => {
+                    clearTimeout(timer);
+                    delete window[callbackName];
+                    script.remove();
+                    resolve(data);
+                };
+
+                script.onerror = () => {
+                    clearTimeout(timer);
+                    delete window[callbackName];
+                    script.remove();
+                    reject(new Error('تعذر الاتصال بالخادم'));
+                };
+
+                timer = setTimeout(() => {
+                    delete window[callbackName];
+                    script.remove();
+                    reject(new Error('انتهت مهلة الاتصال'));
+                }, 15000);
+
+                script.src = rewardCardsWebAppURL + '?' + query.toString();
+                document.body.appendChild(script);
+            });
+        }
+
+        function normalizeRewardCode(raw) {
+            let code = String(raw || '').trim();
+            if (code.toUpperCase().startsWith('OTK:')) code = code.slice(4);
+            return code.trim();
+        }
+
+        function showRewardResult(message, type = 'info') {
+            const box = document.getElementById('rewardScanResult');
+            if (!box) return;
+            box.className = 'reward-result show ' + type;
+            box.textContent = message;
+        }
+
+        async function redeemRewardCard(rawCode) {
+            if (rewardRedeeming) return;
+            const cardCode = normalizeRewardCode(rawCode);
+            const studentData = JSON.parse(localStorage.getItem('studentData'));
+
+            if (!studentData || !studentData.code) {
+                showRewardResult('انتهت جلسة الطالب. سجّل الدخول مرة أخرى.', 'error');
+                return;
+            }
+            if (!cardCode) {
+                showRewardResult('أدخل أو امسح كود بطاقة صحيح.', 'error');
+                return;
+            }
+
+            rewardRedeeming = true;
+            showRewardResult('جاري التحقق من البطاقة وإضافة النقاط...', 'info');
+
+            try {
+                const result = await rewardJsonp({
+                    action: 'redeemCard',
+                    cardCode,
+                    studentCode: studentData.code
+                });
+
+                if (!result || !result.ok) {
+                    showRewardResult((result && result.message) || 'تعذر استخدام البطاقة.', 'error');
+                    return;
+                }
+
+                const pts = Number(result.points || 0);
+                const oldPts = Number(studentData.points || 0);
+                studentData.points = oldPts + pts;
+                localStorage.setItem('studentData', JSON.stringify(studentData));
+
+                document.getElementById('statTotalPoints').innerText = studentData.points;
+                document.getElementById('settingsPoints').innerText = studentData.points;
+
+                showRewardResult(`تمت إضافة ${pts} نقطة — ${result.item || 'بطاقة نقاط'}. تم إغلاق البطاقة الآن ولا يمكن استخدامها مرة أخرى.`, 'success');
+                document.getElementById('rewardManualCode').value = '';
+                fetchOperations(studentData.code);
+                stopRewardScanner();
+            } catch (err) {
+                console.error(err);
+                showRewardResult(err.message || 'حدث خطأ أثناء استخدام البطاقة.', 'error');
+            } finally {
+                rewardRedeeming = false;
+            }
+        }
+
+        async function startRewardScanner() {
+            if (rewardScannerRunning) return;
+            if (typeof Html5Qrcode === 'undefined') {
+                showRewardResult('تعذر تحميل قارئ الباركود. تحقق من اتصال الإنترنت.', 'error');
+                return;
+            }
+            try {
+                rewardScanner = rewardScanner || new Html5Qrcode('rewardReader');
+                await rewardScanner.start(
+                    { facingMode: 'environment' },
+                    { fps: 10, qrbox: { width: 280, height: 150 } },
+                    async (decodedText) => {
+                        if (rewardRedeeming) return;
+                        await redeemRewardCard(decodedText);
+                    },
+                    () => {}
+                );
+                rewardScannerRunning = true;
+                showRewardResult('الكاميرا تعمل. وجّهها إلى الباركود.', 'info');
+            } catch (err) {
+                console.error(err);
+                showRewardResult('تعذر تشغيل الكاميرا. تأكد من السماح للموقع باستخدام الكاميرا وفتح الموقع عبر HTTPS.', 'error');
+            }
+        }
+
+        async function stopRewardScanner() {
+            if (!rewardScanner || !rewardScannerRunning) return;
+            try {
+                await rewardScanner.stop();
+            } catch (_) {}
+            rewardScannerRunning = false;
+        }
+
+        const startRewardScanBtn = document.getElementById('startRewardScanBtn');
+        const stopRewardScanBtn = document.getElementById('stopRewardScanBtn');
+        const redeemManualBtn = document.getElementById('redeemManualBtn');
+        if (startRewardScanBtn) startRewardScanBtn.addEventListener('click', startRewardScanner);
+        if (stopRewardScanBtn) stopRewardScanBtn.addEventListener('click', stopRewardScanner);
+        if (redeemManualBtn) redeemManualBtn.addEventListener('click', () => redeemRewardCard(document.getElementById('rewardManualCode').value));
+        const rewardManualCode = document.getElementById('rewardManualCode');
+        if (rewardManualCode) rewardManualCode.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') redeemRewardCard(rewardManualCode.value);
+        });
+
+
+        async function updatePassword(event) {
+            event.preventDefault();
+
+            const currentPassInput = document.getElementById('currentPass').value.trim();
+            const newPassInput = document.getElementById('newPass').value.trim();
+            const alertBox = document.getElementById('settingsAlert');
+            const saveBtn = document.getElementById('saveBtn');
+
+            const studentData = JSON.parse(localStorage.getItem('studentData'));
+
+            if (!studentData || !studentData.code) {
+                alert('يرجى تسجيل الدخول مرة أخرى');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (currentPassInput !== studentData.password) {
+                alertBox.style.display = 'block';
+                alertBox.style.background = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.innerText = 'كلمة السر الحالية غير صحيحة!';
+                return;
+            }
+
+            alertBox.style.display = 'block';
+            alertBox.style.background = '#e0f2fe';
+            alertBox.style.color = '#0369a1';
+            alertBox.innerText = 'جاري تحديث كلمة السر وتعديلها في السجل...';
+            saveBtn.disabled = true;
+
+            try {
+                await fetch(webAppURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: studentData.code,
+                        newPassword: newPassInput
+                    })
+                });
+
+                studentData.password = newPassInput;
+                localStorage.setItem('studentData', JSON.stringify(studentData));
+
+                alertBox.style.background = '#dcfce7';
+                alertBox.style.color = '#166534';
+                alertBox.innerText = 'تم تغيير كلمة السر بنجاح وإرسالها إلى ملف الطلاب (العمود B)!';
+                
+                document.getElementById('changePasswordForm').reset();
+                saveBtn.disabled = false;
+
+            } catch (error) {
+                console.error(error);
+                alertBox.style.background = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.innerText = 'حدث خطأ أثناء التحديث، يرجى المحاولة لاحقاً.';
+                saveBtn.disabled = false;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('studentData');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

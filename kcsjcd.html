@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>إدارة الدوري</title>
+
+<style>
+*{box-sizing:border-box}
+:root{
+  --primary:#1597d4;
+  --primary-dark:#0d5f8d;
+  --primary-soft:#eaf7fd;
+  --accent:#7cc7ec;
+  --bg:#f5f9fc;
+  --bg2:#edf6fb;
+  --card:#ffffff;
+  --text:#173247;
+  --muted:#72889a;
+  --line:#dceaf2;
+  --danger:#b63f45;
+  --danger-soft:#fff1f2;
+  --warning:#a97818;
+  --warning-soft:#fff7e7;
+  --shadow:0 14px 40px rgba(28,95,132,.09);
+  --shadow-soft:0 8px 24px rgba(28,95,132,.07);
+  --radius-xl:24px;
+  --radius-lg:18px;
+  --radius-md:14px;
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  background:
+    radial-gradient(circle at top right,rgba(21,151,212,.08),transparent 28%),
+    linear-gradient(180deg,#f8faf9 0%,var(--bg) 55%,var(--bg2) 100%);
+  color:var(--text);
+}
+button,input,select{font:inherit}
+button{-webkit-tap-highlight-color:transparent}
+header{
+  position:sticky;
+  top:0;
+  z-index:40;
+  background:linear-gradient(135deg,#0b4f78 0%,#0d77ad 45%,#20a8e6 100%);
+  color:#fff;
+  box-shadow:0 10px 30px rgba(7,67,104,.22);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.header-row{
+  max-width:1280px;
+  margin:auto;
+  min-height:78px;
+  padding:14px 20px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.brand h1{
+  margin:0;
+  font-size:clamp(20px,2.2vw,30px);
+  font-weight:800;
+  letter-spacing:.1px;
+}
+.brand small{
+  opacity:.78;
+  font-size:13px;
+}
+nav{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 20px 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+nav::-webkit-scrollbar{display:none}
+nav button{
+  flex:0 0 auto;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  padding:10px 16px;
+  min-height:42px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+nav button:hover{
+  background:rgba(255,255,255,.15);
+  transform:translateY(-1px);
+}
+nav button.active{
+  background:#fff;
+  color:var(--primary-dark);
+  border-color:#fff;
+  box-shadow:0 5px 16px rgba(0,0,0,.12);
+}
+main{
+  max-width:1280px;
+  margin:26px auto 0;
+  padding:0 20px 80px;
+}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+}
+.card{
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:var(--radius-xl);
+  padding:22px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.card h2{
+  margin:0 0 16px;
+  font-size:20px;
+  color:var(--primary-dark);
+}
+.card h3{
+  color:var(--primary-dark);
+}
+.stat{
+  position:relative;
+  overflow:hidden;
+  min-height:135px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.stat:before{
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:linear-gradient(135deg,rgba(21,151,212,.12),rgba(124,199,236,.10));
+  left:-24px;
+  top:-24px;
+}
+.stat strong{
+  position:relative;
+  display:block;
+  font-size:clamp(30px,4vw,42px);
+  line-height:1;
+  color:var(--primary);
+  font-weight:800;
+}
+.stat span{
+  position:relative;
+  margin-top:10px;
+  color:var(--muted);
+  font-weight:700;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  align-items:end;
+}
+input,select{
+  width:100%;
+  min-height:48px;
+  padding:12px 14px;
+  border:1px solid #cfdcd7;
+  border-radius:var(--radius-md);
+  background:#fff;
+  color:var(--text);
+  outline:none;
+  transition:.2s ease;
+}
+input::placeholder{color:#9aa7a2}
+input:focus,select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(21,151,212,.10);
+}
+.btn{
+  min-height:46px;
+  border:0;
+  border-radius:var(--radius-md);
+  padding:11px 17px;
+  cursor:pointer;
+  font-weight:800;
+  transition:.2s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+  box-shadow:0 8px 18px rgba(21,151,212,.22);
+}
+.btn.secondary{
+  background:var(--primary-soft);
+  color:var(--primary-dark);
+}
+.btn.danger{
+  background:var(--danger-soft);
+  color:var(--danger);
+}
+.btn.warning{
+  background:var(--warning-soft);
+  color:var(--warning);
+}
+.toolbar{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(190px,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+.match-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.match{
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:18px;
+  background:linear-gradient(180deg,#fff,#f8fcff);
+  box-shadow:var(--shadow-soft);
+  transition:.2s ease;
+}
+.match:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(28,95,132,.10);
+}
+.match-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+}
+.match-score{
+  min-width:84px;
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  color:var(--primary);
+  padding:8px 10px;
+  background:var(--primary-soft);
+  border-radius:14px;
+}
+.muted{color:var(--muted)}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:var(--primary-soft);
+  color:var(--primary-dark);
+  font-size:12px;
+  font-weight:800;
+}
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+}
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  min-width:760px;
+}
+th,td{
+  padding:13px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+  white-space:nowrap;
+}
+th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#eef8fd;
+  color:var(--primary-dark);
+  font-weight:800;
+}
+tbody tr:hover td{background:#fbfdff}
+tbody tr:last-child td{border-bottom:0}
+.event-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  margin-top:9px;
+  background:#fbfdff;
+}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(4,20,15,.58);
+  backdrop-filter:blur(5px);
+  padding:24px;
+  overflow:auto;
+}
+.modal.show{display:block}
+.modal-box{
+  width:min(820px,100%);
+  margin:28px auto;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.4);
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 30px 80px rgba(0,0,0,.22);
+}
+.statusbar{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:140;
+  max-width:min(92vw,650px);
+  padding:10px 16px;
+  border-radius:999px;
+  background:#0b5f8f;
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 10px 26px rgba(0,0,0,.18);
+}
+.statusbar.error{background:#96323a}
+
+/* iPad / Tablet */
+@media(max-width:1024px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .match-list{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid .btn{grid-column:1/-1}
+}
+
+/* iPad portrait / large mobile */
+@media(max-width:768px){
+  .header-row{
+    min-height:auto;
+    padding:14px 14px 8px;
+  }
+  nav{padding:0 14px 12px}
+  main{
+    margin-top:18px;
+    padding:0 14px 72px;
+  }
+  .card{
+    padding:18px;
+    border-radius:20px;
+  }
+  .toolbar{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .btn{grid-column:auto}
+  .modal{padding:12px}
+  .modal-box{
+    margin:12px auto;
+    padding:18px;
+    border-radius:20px;
+  }
+}
+
+/* Mobile */
+@media(max-width:560px){
+  body{background:#f6fafe}
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .stat{
+    min-height:112px;
+    padding:16px;
+  }
+  .stat strong{font-size:30px}
+  .stat span{font-size:13px}
+  .brand h1{font-size:20px}
+  .brand small{
+    max-width:290px;
+    line-height:1.6;
+  }
+  nav button{
+    padding:9px 13px;
+    min-height:40px;
+    font-size:13px;
+  }
+  .match{padding:14px}
+  .match-head{align-items:flex-start}
+  .match-score{font-size:22px;min-width:72px}
+  .event-item{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .event-item .btn{width:100%}
+  .modal-box .form-grid{gap:10px}
+}
+
+/* Small mobile */
+@media(max-width:390px){
+  .grid{grid-template-columns:1fr}
+  .card{padding:15px}
+  main{padding-left:10px;padding-right:10px}
+  nav{padding-left:10px;padding-right:10px}
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="brand">
+      <h1>نظام إدارة الدوري لوتك</h1>
+      <small>الجولات • المباريات • الأهداف • البطاقات • جدول الدوري</small>
+    </div>
+  </div>
+
+  <nav>
+    <button class="active" data-page="home">الرئيسية</button>
+    <button data-page="teams">الفرق</button>
+    <button data-page="addmatch">إضافة مباراة</button>
+    <button data-page="matches">المباريات</button>
+    <button data-page="standings">جدول الدوري</button>
+    <button data-page="stats">الهدافون والكروت</button>
+  </nav>
+</header>
+
+<main>
+
+<section id="home" class="page active">
+  <div class="grid">
+    <div class="card stat"><strong id="sTeams">0</strong><span>الفرق</span></div>
+    <div class="card stat"><strong id="sMatches">0</strong><span>المباريات</span></div>
+    <div class="card stat"><strong id="sGoals">0</strong><span>الأهداف</span></div>
+    <div class="card stat"><strong id="sCards">0</strong><span>البطاقات</span></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>آخر المباريات</h2>
+    <div id="recentMatches" class="match-list"></div>
+  </div>
+</section>
+
+<section id="teams" class="page">
+  <div class="card">
+    <h2>إضافة فريق</h2>
+    <div class="form-grid">
+      <input id="teamName" placeholder="مثال: الأحمر">
+      <button class="btn primary" onclick="addTeam()">إضافة الفريق</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>الفرق</h2>
+    <div id="teamsList"></div>
+  </div>
+</section>
+
+<section id="addmatch" class="page">
+  <div class="card">
+    <h2>إضافة مباراة</h2>
+    <div class="form-grid">
+      <input id="roundName" placeholder="مثال: الجولة 1">
+      <select id="homeTeam"></select>
+      <select id="awayTeam"></select>
+      <button class="btn primary" onclick="addMatch()">حفظ المباراة</button>
+    </div>
+  </div>
+</section>
+
+<section id="matches" class="page">
+  <div class="card">
+    <div class="toolbar">
+      <input id="matchSearch" placeholder="بحث باسم الفريق أو الجولة" oninput="renderMatches()">
+      <select id="roundFilter" onchange="renderMatches()"></select>
+    </div>
+    <div id="matchesList" class="match-list"></div>
+  </div>
+</section>
+
+<section id="standings" class="page">
+  <div class="card">
+    <h2>جدول الدوري</h2>
+    <div class="muted" style="margin-bottom:12px">الفوز 3 نقاط • التعادل 1 نقطة • الخسارة 0</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الفريق</th>
+            <th>لعب</th>
+            <th>فاز</th>
+            <th>تعادل</th>
+            <th>خسر</th>
+            <th>له</th>
+            <th>عليه</th>
+            <th>الفارق</th>
+            <th>النقاط</th>
+          </tr>
+        </thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="stats" class="page">
+  <div class="card">
+    <h2>الهدافون</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>الطالب</th><th>الفريق</th><th>الأهداف</th></tr></thead>
+        <tbody id="scorersBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>البطاقات</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الطالب</th><th>الفريق</th><th>صفراء</th><th>حمراء</th></tr></thead>
+        <tbody id="cardsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="matchModal" class="modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;gap:10px">
+      <div>
+        <h2 id="modalTitle">المباراة</h2>
+        <div id="modalScore" class="match-score">0 - 0</div>
+      </div>
+      <button class="btn secondary" onclick="closeMatch()">إغلاق</button>
+    </div>
+
+    <hr style="border:0;border-top:1px solid #e5ece9;margin:18px 0">
+
+    <div class="form-grid">
+      <select id="eventTeam"></select>
+      <input id="studentName" placeholder="اسم الطالب">
+      <select id="eventType">
+        <option value="goal">هدف</option>
+        <option value="yellow">كرت أصفر</option>
+        <option value="red">كرت أحمر</option>
+      </select>
+      <input id="eventMinute" type="number" min="0" placeholder="الدقيقة - اختياري">
+      <button class="btn primary" onclick="addEvent()">تسجيل الحدث</button>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn warning" id="finishBtn" onclick="toggleMatchStatus()"></button>
+      <button class="btn danger" onclick="deleteCurrentMatch()">حذف المباراة</button>
+    </div>
+
+    <h3>أحداث المباراة</h3>
+    <div id="eventsList"></div>
+  </div>
+</div>
+
+<div id="statusbar" class="statusbar">جاري الاتصال...</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOW2-YB-c5aGS9dp6FXFdp0uR5zmBz9FlrtfIbi4yBAnEKrWhgjKy7zL7IHuGKZbTS/exec';
+
+let db = {
+  teams: [],
+  matches: [],
+  standings: []
+};
+
+let allEvents = [];
+let currentMatchId = null;
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function setStatus(text, error=false) {
+  const el = document.getElementById('statusbar');
+  el.textContent = text;
+  el.classList.toggle('error', !!error);
+}
+
+function safeJson(text) {
+  const clean = String(text || '').trim();
+
+  if (!clean) {
+    throw new Error('لم يصل رد من Apps Script');
+  }
+
+  if (clean.startsWith('<')) {
+    throw new Error('الله يحفضك تأكد من الشبكة ');
+  }
+
+  try {
+    return JSON.parse(clean);
+  } catch (e) {
+    throw new Error('رد Apps Script ليس JSON صالحًا');
+  }
+}
+
+async function loadData() {
+  try {
+    setStatus('جاري الاتصال بـ  رسيرفر اوتك...');
+
+    const response = await fetch(
+      SCRIPT_URL + '?t=' + Date.now(),
+      {
+        method: 'GET',
+        redirect: 'follow',
+        cache: 'no-store'
+      }
+    );
+
+    const text = await response.text();
+    const result = safeJson(text);
+
+    if (!result.ok) {
+      throw new Error(result.error || 'فشل تحميل البيانات');
+    }
+
+    applyData(result.data);
+    setStatus('متصل بـ  رسيرفر اوتك');
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message, true);
+  }
+}
+
+async function api(action, payload={}) {
+  setStatus('جاري الحفظ...');
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action,
+        ...payload
+      })
+    });
+
+    const text = await response.text();
+    const result = safeJson(text);
+
+    if (!result.ok) {
+      throw new Error(result.error || 'فشل تنفيذ العملية');
+    }
+
+    applyData(result.data);
+    setStatus('تم الحفظ بنجاح');
+    return result;
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message, true);
+    throw error;
+  }
+}
+
+function applyData(data) {
+  db.teams = Array.isArray(data?.teams) ? data.teams : [];
+  db.matches = Array.isArray(data?.matches) ? data.matches : [];
+  db.standings = Array.isArray(data?.standings) ? data.standings : [];
+  allEvents = Array.isArray(data?.events) ? data.events : [];
+
+  renderAll();
+
+  if (currentMatchId) {
+    renderMatchModal();
+  }
+}
+
+function teamName(id) {
+  return db.teams.find(t => String(t.id) === String(id))?.name || 'فريق';
+}
+
+function matchEvents(matchId) {
+  return allEvents.filter(e => String(e.matchId) === String(matchId));
+}
+
+function score(match) {
+  const ev = matchEvents(match.id);
+  const home = ev.filter(e => e.type === 'goal' && String(e.teamId) === String(match.homeId)).length;
+  const away = ev.filter(e => e.type === 'goal' && String(e.teamId) === String(match.awayId)).length;
+  return [home, away];
+}
+
+function renderAll() {
+  renderDashboard();
+  renderTeams();
+  renderTeamSelects();
+  renderMatches();
+  renderStandings();
+  renderStats();
+}
+
+function renderDashboard() {
+  document.getElementById('sTeams').textContent = db.teams.length;
+  document.getElementById('sMatches').textContent = db.matches.length;
+  document.getElementById('sGoals').textContent = allEvents.filter(e => e.type === 'goal').length;
+  document.getElementById('sCards').textContent = allEvents.filter(e => e.type === 'yellow' || e.type === 'red').length;
+
+  const latest = [...db.matches]
+    .sort((a,b) => Number(b.createdAt || 0) - Number(a.createdAt || 0))
+    .slice(0,5);
+
+  document.getElementById('recentMatches').innerHTML =
+    latest.length
+      ? latest.map(matchCard).join('')
+      : '<div class="muted">لا توجد مباريات بعد</div>';
+}
+
+function renderTeams() {
+  const root = document.getElementById('teamsList');
+
+  if (!db.teams.length) {
+    root.innerHTML = '<div class="muted">لا توجد فرق</div>';
+    return;
+  }
+
+  root.innerHTML = db.teams.map(t => `
+    <div class="event-item">
+      <strong>${escapeHtml(t.name)}</strong>
+      <button class="btn danger" onclick="deleteTeam('${t.id}')">حذف</button>
+    </div>
+  `).join('');
+}
+
+function renderTeamSelects() {
+  const options = '<option value="">اختر الفريق</option>' +
+    db.teams.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+
+  document.getElementById('homeTeam').innerHTML = options;
+  document.getElementById('awayTeam').innerHTML = options;
+
+  const rounds = [...new Set(db.matches.map(m => m.round).filter(Boolean))];
+  document.getElementById('roundFilter').innerHTML =
+    '<option value="">كل الجولات</option>' +
+    rounds.map(r => `<option value="${escapeAttr(r)}">${escapeHtml(r)}</option>`).join('');
+}
+
+function matchCard(m) {
+  const [h,a] = score(m);
+  return `
+    <div class="match">
+      <div class="match-head">
+        <div>
+          <span class="badge">${escapeHtml(m.round)}</span>
+          <div style="margin-top:8px;font-weight:800">
+            ${escapeHtml(teamName(m.homeId))} × ${escapeHtml(teamName(m.awayId))}
+          </div>
+        </div>
+        <div class="match-score">${h} - ${a}</div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="badge">${m.status === 'finished' ? 'منتهية' : 'مفتوحة'}</span>
+        <button class="btn secondary" onclick="openMatch('${m.id}')">إدارة المباراة</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderMatches() {
+  const q = String(document.getElementById('matchSearch')?.value || '').trim().toLowerCase();
+  const round = String(document.getElementById('roundFilter')?.value || '');
+
+  let list = [...db.matches];
+
+  if (round) {
+    list = list.filter(m => String(m.round) === round);
+  }
+
+  if (q) {
+    list = list.filter(m => {
+      const txt = `${m.round} ${teamName(m.homeId)} ${teamName(m.awayId)}`.toLowerCase();
+      return txt.includes(q);
+    });
+  }
+
+  list.sort((a,b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+
+  document.getElementById('matchesList').innerHTML =
+    list.length
+      ? list.map(matchCard).join('')
+      : '<div class="muted">لا توجد مباريات</div>';
+}
+
+function renderStandings() {
+  const tbody = document.getElementById('standingsBody');
+
+  tbody.innerHTML = db.standings.length
+    ? db.standings.map(r => `
+      <tr>
+        <td>${r.rank}</td>
+        <td><strong>${escapeHtml(r.teamName)}</strong></td>
+        <td>${r.played}</td>
+        <td>${r.won}</td>
+        <td>${r.drawn}</td>
+        <td>${r.lost}</td>
+        <td>${r.goalsFor}</td>
+        <td>${r.goalsAgainst}</td>
+        <td>${r.goalDifference}</td>
+        <td><strong>${r.points}</strong></td>
+      </tr>
+    `).join('')
+    : '<tr><td colspan="10" class="muted">لا توجد بيانات</td></tr>';
+}
+
+function renderStats() {
+  const map = {};
+
+  allEvents.forEach(e => {
+    const key = `${e.teamId}__${String(e.studentName).trim().toLowerCase()}`;
+
+    if (!map[key]) {
+      map[key] = {
+        name: e.studentName,
+        teamId: e.teamId,
+        goals: 0,
+        yellow: 0,
+        red: 0
+      };
+    }
+
+    if (e.type === 'goal') map[key].goals++;
+    if (e.type === 'yellow') map[key].yellow++;
+    if (e.type === 'red') map[key].red++;
+  });
+
+  const rows = Object.values(map);
+
+  const scorers = rows
+    .filter(x => x.goals > 0)
+    .sort((a,b) => b.goals - a.goals || a.name.localeCompare(b.name,'ar'));
+
+  document.getElementById('scorersBody').innerHTML =
+    scorers.length
+      ? scorers.map((x,i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${escapeHtml(x.name)}</td>
+          <td>${escapeHtml(teamName(x.teamId))}</td>
+          <td><strong>${x.goals}</strong></td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="4" class="muted">لا يوجد أهداف بعد</td></tr>';
+
+  const cards = rows
+    .filter(x => x.yellow > 0 || x.red > 0)
+    .sort((a,b) => (b.red+b.yellow) - (a.red+a.yellow));
+
+  document.getElementById('cardsBody').innerHTML =
+    cards.length
+      ? cards.map(x => `
+        <tr>
+          <td>${escapeHtml(x.name)}</td>
+          <td>${escapeHtml(teamName(x.teamId))}</td>
+          <td>${x.yellow}</td>
+          <td>${x.red}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="4" class="muted">لا توجد بطاقات</td></tr>';
+}
+
+async function addTeam() {
+  const input = document.getElementById('teamName');
+  const name = input.value.trim();
+
+  if (!name) {
+    alert('اكتب اسم الفريق');
+    return;
+  }
+
+  await api('addTeam', {
+    data: {
+      id: uid(),
+      name
+    }
+  });
+
+  input.value = '';
+}
+
+async function deleteTeam(id) {
+  if (!confirm('حذف الفريق؟')) return;
+  await api('deleteTeam', { id });
+}
+
+async function addMatch() {
+  const round = document.getElementById('roundName').value.trim();
+  const homeId = document.getElementById('homeTeam').value;
+  const awayId = document.getElementById('awayTeam').value;
+
+  if (!round) {
+    alert('اكتب الجولة');
+    return;
+  }
+
+  if (!homeId || !awayId) {
+    alert('اختر الفريقين');
+    return;
+  }
+
+  if (homeId === awayId) {
+    alert('اختر فريقين مختلفين');
+    return;
+  }
+
+  await api('addMatch', {
+    data: {
+      id: uid(),
+      round,
+      homeId,
+      awayId,
+      status: 'open',
+      createdAt: Date.now()
+    }
+  });
+
+  document.getElementById('roundName').value = '';
+  showPage('matches');
+}
+
+function openMatch(id) {
+  currentMatchId = id;
+  document.getElementById('matchModal').classList.add('show');
+  renderMatchModal();
+}
+
+function closeMatch() {
+  currentMatchId = null;
+  document.getElementById('matchModal').classList.remove('show');
+}
+
+function currentMatch() {
+  return db.matches.find(m => String(m.id) === String(currentMatchId));
+}
+
+function renderMatchModal() {
+  const m = currentMatch();
+
+  if (!m) {
+    closeMatch();
+    return;
+  }
+
+  const [h,a] = score(m);
+
+  document.getElementById('modalTitle').textContent =
+    `${teamName(m.homeId)} × ${teamName(m.awayId)} — ${m.round}`;
+
+  document.getElementById('modalScore').textContent = `${h} - ${a}`;
+
+  document.getElementById('eventTeam').innerHTML = `
+    <option value="${m.homeId}">${escapeHtml(teamName(m.homeId))}</option>
+    <option value="${m.awayId}">${escapeHtml(teamName(m.awayId))}</option>
+  `;
+
+  const finishBtn = document.getElementById('finishBtn');
+  finishBtn.textContent = m.status === 'finished' ? 'إعادة فتح المباراة' : 'إنهاء المباراة';
+
+  const ev = matchEvents(m.id).sort((a,b) => Number(b.createdAt||0)-Number(a.createdAt||0));
+
+  document.getElementById('eventsList').innerHTML =
+    ev.length
+      ? ev.map(e => `
+        <div class="event-item">
+          <div>
+            <strong>${escapeHtml(e.studentName)}</strong>
+            <div class="muted">
+              ${escapeHtml(teamName(e.teamId))} •
+              ${e.type === 'goal' ? 'هدف' : e.type === 'yellow' ? 'كرت أصفر' : 'كرت أحمر'}
+              ${e.minute ? ' • الدقيقة ' + escapeHtml(e.minute) : ''}
+            </div>
+          </div>
+          <button class="btn danger" onclick="deleteEvent('${e.id}')">حذف</button>
+        </div>
+      `).join('')
+      : '<div class="muted">لا توجد أحداث</div>';
+}
+
+async function addEvent() {
+  const m = currentMatch();
+  if (!m) return;
+
+  if (m.status === 'finished') {
+    alert('المباراة منتهية. أعد فتحها أولًا.');
+    return;
+  }
+
+  const teamId = document.getElementById('eventTeam').value;
+  const studentName = document.getElementById('studentName').value.trim();
+  const type = document.getElementById('eventType').value;
+  const minute = document.getElementById('eventMinute').value.trim();
+
+  if (!studentName) {
+    alert('اكتب اسم الطالب');
+    return;
+  }
+
+  await api('addEvent', {
+    data: {
+      id: uid(),
+      matchId: m.id,
+      teamId,
+      studentName,
+      type,
+      minute,
+      createdAt: Date.now()
+    }
+  });
+
+  document.getElementById('studentName').value = '';
+  document.getElementById('eventMinute').value = '';
+}
+
+async function deleteEvent(id) {
+  if (!confirm('حذف الحدث؟')) return;
+  await api('deleteEvent', { id });
+}
+
+async function toggleMatchStatus() {
+  const m = currentMatch();
+  if (!m) return;
+
+  const newStatus = m.status === 'finished' ? 'open' : 'finished';
+
+  await api('setMatchStatus', {
+    id: m.id,
+    status: newStatus
+  });
+}
+
+async function deleteCurrentMatch() {
+  const m = currentMatch();
+  if (!m) return;
+
+  if (!confirm('حذف المباراة وجميع أحداثها؟')) return;
+
+  await api('deleteMatch', { id: m.id });
+  closeMatch();
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+
+  document.getElementById(id).classList.add('active');
+  document.querySelector(`nav button[data-page="${id}"]`)?.classList.add('active');
+}
+
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+
+function escapeHtml(v) {
+  return String(v ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+function escapeAttr(v) {
+  return escapeHtml(v);
+}
+
+loadData();
+</script>
+</body>
+</html>

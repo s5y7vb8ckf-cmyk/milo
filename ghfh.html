@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>إدارة المشرفين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0f6b50;--green2:#0b523e;--bg:#f5f8f7;--card:#fff;
+  --text:#17332a;--muted:#718079;--line:#e4ebe8;--danger:#c63f4a;
+  --warning:#b7791f;--shadow:0 14px 35px rgba(20,60,48,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Tajawal",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+.app{min-height:100vh}
+.topbar{
+  height:72px;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  position:sticky;top:0;z-index:20
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px}
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--green2));display:grid;place-items:center;color:#fff}
+.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;background:#20a66a}
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 72px)}
+.sidebar{background:#fff;border-left:1px solid var(--line);padding:18px}
+.nav-btn{
+ width:100%;border:0;background:transparent;color:var(--text);padding:13px 14px;border-radius:12px;
+ text-align:right;cursor:pointer;font-weight:700;margin-bottom:7px
+}
+.nav-btn.active{background:#eaf5f1;color:var(--green)}
+.main{padding:24px;overflow:auto}
+.page{display:none}.page.active{display:block}
+.heading{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:18px}
+.heading h1{font-size:25px;margin:0}.heading p{margin:5px 0 0;color:var(--muted)}
+.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:700;cursor:pointer}
+.btn-primary{background:var(--green);color:#fff}.btn-light{background:#edf3f1;color:var(--text)}
+.btn-danger{background:#fff0f1;color:var(--danger)}.btn-warning{background:#fff7e8;color:var(--warning)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:var(--shadow)}
+.kpi-label{color:var(--muted);font-size:13px}.kpi-value{font-size:29px;font-weight:800;margin-top:7px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search{flex:1;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none}
+.table-wrap{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:14px;border-bottom:1px solid var(--line);text-align:right}
+th{font-size:13px;color:var(--muted);background:#fafcfb}
+.badge{display:inline-block;padding:5px 10px;border-radius:999px;background:#edf6f2;color:var(--green);font-weight:700;font-size:12px}
+.actions{display:flex;gap:7px}.small{padding:7px 10px;font-size:12px}
+.empty{text-align:center!important;color:var(--muted);padding:35px!important}
+.modal-backdrop{position:fixed;inset:0;background:rgba(7,25,19,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal-backdrop.show{display:flex}
+.modal{width:min(560px,100%);background:#fff;border-radius:20px;box-shadow:0 25px 70px rgba(0,0,0,.2);padding:22px}
+.modal h2{margin:0 0 18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{margin-bottom:13px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 12px;outline:none;background:#fff}
+.modal-actions{display:flex;gap:9px;justify-content:flex-start;margin-top:8px}
+.role-bars{display:grid;gap:10px}
+.role-row{background:#fff;border:1px solid var(--line);padding:13px;border-radius:13px}
+.role-head{display:flex;justify-content:space-between;margin-bottom:8px}
+.bar{height:9px;background:#edf2f0;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--green);border-radius:999px}
+.toast{position:fixed;left:20px;bottom:20px;background:#15382e;color:#fff;padding:12px 15px;border-radius:12px;opacity:0;transform:translateY(15px);pointer-events:none;transition:.25s;z-index:100}
+.toast.show{opacity:1;transform:translateY(0)}
+.loader{display:none;margin:15px 0;color:var(--muted)}.loader.show{display:block}
+@media(max-width:900px){
+ .shell{grid-template-columns:1fr}.sidebar{display:flex;gap:7px;overflow:auto;border-left:0;border-bottom:1px solid var(--line);padding:10px}
+ .nav-btn{width:auto;white-space:nowrap;margin:0}.main{padding:15px}.cards{grid-template-columns:1fr 1fr}.topbar{padding:0 14px}
+}
+@media(max-width:560px){.cards{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.status span:last-child{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">م</div><div>إدارة المشرفين</div></div>
+  <div class="status"><span class="dot"></span><span>النظام متصل</span></div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+    <button class="nav-btn active" data-page="dashboard">لوحة التحكم</button>
+    <button class="nav-btn" data-page="supervisors">المشرفون</button>
+    <button class="nav-btn" data-page="reports">التقارير</button>
+  </aside>
+
+  <main class="main">
+    <section id="dashboard" class="page active">
+      <div class="heading">
+        <div><h1>لوحة التحكم</h1><p>ملخص بيانات المشرفين</p></div>
+        <button class="btn btn-primary" onclick="openAdd()">+ إضافة مشرف</button>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="kpi-label">إجمالي المشرفين</div><div class="kpi-value" id="kTotal">0</div></div>
+        <div class="card"><div class="kpi-label">عدد الأدوار</div><div class="kpi-value" id="kRoles">0</div></div>
+        <div class="card"><div class="kpi-label">بيانات مكتملة</div><div class="kpi-value" id="kComplete">0</div></div>
+        <div class="card"><div class="kpi-label">آخر تحديث</div><div class="kpi-value" style="font-size:18px" id="kUpdated">—</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">آخر المشرفين</h3>
+        <div id="recentList"></div>
+      </div>
+    </section>
+
+    <section id="supervisors" class="page">
+      <div class="heading">
+        <div><h1>المشرفون</h1><p>إضافة وتعديل وحذف بيانات المشرفين</p></div>
+        <button class="btn btn-primary" onclick="openAdd()">+ إضافة مشرف</button>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" class="search" placeholder="ابحث بالاسم أو الكود أو الصفة..." oninput="renderTable()">
+        <button class="btn btn-light" onclick="loadData()">تحديث البيانات</button>
+      </div>
+      <div class="loader" id="loader">جاري تحميل البيانات...</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>الكود</th><th>الاسم</th><th>الصفة</th><th>كلمة السر</th><th>الإجراءات</th></tr></thead>
+          <tbody id="supBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="reports" class="page">
+      <div class="heading"><div><h1>التقارير</h1><p>إحصائيات المشرفين حسب الصفة</p></div><button class="btn btn-light" onclick="window.print()">طباعة التقرير</button></div>
+      <div class="cards">
+        <div class="card"><div class="kpi-label">إجمالي المشرفين</div><div class="kpi-value" id="rTotal">0</div></div>
+        <div class="card"><div class="kpi-label">الأدوار المختلفة</div><div class="kpi-value" id="rRoles">0</div></div>
+        <div class="card"><div class="kpi-label">بدون صفة</div><div class="kpi-value" id="rNoRole">0</div></div>
+        <div class="card"><div class="kpi-label">السجلات المكتملة</div><div class="kpi-value" id="rComplete">0</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">توزيع المشرفين حسب الصفة</h3>
+        <div id="roleReport" class="role-bars"></div>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2 id="modalTitle">إضافة مشرف</h2>
+    <form id="supForm">
+      <input type="hidden" id="oldCode">
+      <div class="grid2">
+        <div class="field"><label>كود المشرف</label><input id="code" required autocomplete="off"></div>
+        <div class="field"><label>كلمة السر</label><input id="password" required autocomplete="off"></div>
+      </div>
+      <div class="field"><label>اسم المشرف</label><input id="name" required></div>
+      <div class="field"><label>الصفة / الدور</label><input id="role" placeholder="مثال: مشرف عام"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="saveBtn" type="submit">حفظ</button>
+        <button class="btn btn-light" type="button" onclick="closeModal()">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSaCHiKgZZMaf8603SCRHKZs0Y9P4rW1zQG1udijGM24e9t83S41NKbv_DH80HlCeXwRW6IJLfnc7Ps/pub?gid=0&single=true&output=csv";
+
+// ضع رابط نشر Apps Script هنا بعد نشره كتطبيق ويب:
+const API_URL = "https://script.google.com/macros/s/AKfycbwKENJzxKxFSRb2TMcTHuJNitaWs6CNJXjZxXHRYU9GDqyNcoJj3rJRb5pVyRaWZqFW/exec";
+
+let supervisors = [];
+let editMode = false;
+
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.page).classList.add("active");
+  });
+});
+
+function parseCSV(text){
+  const rows=[]; let row=[], field="", inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"'){
+      if(inQuotes && n === '"'){ field+='"'; i++; }
+      else inQuotes=!inQuotes;
+    }else if(c === "," && !inQuotes){ row.push(field); field=""; }
+    else if((c === "\n" || c === "\r") && !inQuotes){
+      if(c === "\r" && n === "\n") i++;
+      row.push(field); field="";
+      if(row.some(v=>v.trim()!=="")) rows.push(row);
+      row=[];
+    }else field+=c;
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function norm(v){ return String(v ?? "").trim(); }
+
+async function loadData(){
+  const loader=document.getElementById("loader");
+  loader.classList.add("show");
+  try{
+    const res=await fetch(CSV_URL + "&t=" + Date.now(), {cache:"no-store"});
+    if(!res.ok) throw new Error("تعذر جلب CSV");
+    const text=await res.text();
+    const rows=parseCSV(text);
+
+    // نتخطى صف العناوين إذا كان أول صف يبدو كعناوين
+    let start=0;
+    if(rows.length){
+      const first=rows[0].map(x=>norm(x).toLowerCase()).join("|");
+      if(first.includes("كود") || first.includes("الاسم") || first.includes("مشرف")) start=1;
+    }
+
+    supervisors = rows.slice(start).map((r,idx)=>({
+      row: idx + start + 1,
+      code:norm(r[0]),
+      password:norm(r[1]),
+      name:norm(r[2]),
+      role:norm(r[3])
+    })).filter(x=>x.code || x.name);
+
+    renderAll();
+    toast("تم تحديث البيانات");
+  }catch(err){
+    console.error(err);
+    toast("تعذر قراءة الجدول المنشور");
+  }finally{
+    loader.classList.remove("show");
+  }
+}
+
+function renderAll(){
+  renderTable();
+  renderDashboard();
+  renderReports();
+}
+
+function renderTable(){
+  const q=norm(document.getElementById("searchInput")?.value).toLowerCase();
+  const body=document.getElementById("supBody");
+  const data=supervisors.filter(s=>
+    [s.code,s.name,s.role].some(v=>norm(v).toLowerCase().includes(q))
+  );
+  if(!data.length){
+    body.innerHTML='<tr><td class="empty" colspan="6">لا توجد بيانات مطابقة</td></tr>';
+    return;
+  }
+  body.innerHTML=data.map((s,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${escapeHtml(s.code)}</b></td>
+      <td>${escapeHtml(s.name)}</td>
+      <td><span class="badge">${escapeHtml(s.role || "بدون صفة")}</span></td>
+      <td>${maskPassword(s.password)}</td>
+      <td>
+        <div class="actions">
+          <button class="btn btn-warning small" onclick='openEdit(${JSON.stringify(s.code)})'>تعديل</button>
+          <button class="btn btn-danger small" onclick='deleteSupervisor(${JSON.stringify(s.code)},${JSON.stringify(s.name)})'>حذف</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+
+function renderDashboard(){
+  const roles=new Set(supervisors.map(s=>s.role).filter(Boolean));
+  const complete=supervisors.filter(s=>s.code&&s.password&&s.name&&s.role).length;
+  document.getElementById("kTotal").textContent=supervisors.length;
+  document.getElementById("kRoles").textContent=roles.size;
+  document.getElementById("kComplete").textContent=complete;
+  document.getElementById("kUpdated").textContent=new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});
+  const recent=supervisors.slice(-5).reverse();
+  document.getElementById("recentList").innerHTML=recent.length
+    ? recent.map(s=>`<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><b>${escapeHtml(s.name||s.code)}</b><span class="badge">${escapeHtml(s.role||"بدون صفة")}</span></div>`).join("")
+    : '<div style="color:var(--muted)">لا توجد بيانات حتى الآن</div>';
+}
+
+function renderReports(){
+  const counts={};
+  let noRole=0, complete=0;
+  supervisors.forEach(s=>{
+    if(s.role) counts[s.role]=(counts[s.role]||0)+1; else noRole++;
+    if(s.code&&s.password&&s.name&&s.role) complete++;
+  });
+  document.getElementById("rTotal").textContent=supervisors.length;
+  document.getElementById("rRoles").textContent=Object.keys(counts).length;
+  document.getElementById("rNoRole").textContent=noRole;
+  document.getElementById("rComplete").textContent=complete;
+  const max=Math.max(1,...Object.values(counts));
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById("roleReport").innerHTML=entries.length
+    ? entries.map(([role,count])=>`
+      <div class="role-row">
+        <div class="role-head"><b>${escapeHtml(role)}</b><span>${count}</span></div>
+        <div class="bar"><i style="width:${(count/max)*100}%"></i></div>
+      </div>`).join("")
+    : '<div style="color:var(--muted)">لا توجد أدوار مسجلة</div>';
+}
+
+function openAdd(){
+  editMode=false;
+  document.getElementById("modalTitle").textContent="إضافة مشرف";
+  document.getElementById("supForm").reset();
+  document.getElementById("oldCode").value="";
+  document.getElementById("code").disabled=false;
+  document.getElementById("modal").classList.add("show");
+  setTimeout(()=>document.getElementById("code").focus(),50);
+}
+
+function openEdit(code){
+  const s=supervisors.find(x=>x.code===code);
+  if(!s) return;
+  editMode=true;
+  document.getElementById("modalTitle").textContent="تعديل المشرف";
+  document.getElementById("oldCode").value=s.code;
+  document.getElementById("code").value=s.code;
+  document.getElementById("password").value=s.password;
+  document.getElementById("name").value=s.name;
+  document.getElementById("role").value=s.role;
+  document.getElementById("code").disabled=false;
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+
+document.getElementById("modal").addEventListener("click",e=>{
+  if(e.target.id==="modal") closeModal();
+});
+
+document.getElementById("supForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  if(API_URL.includes("PUT_YOUR")){
+    toast("ضع رابط Apps Script داخل API_URL أولاً");
+    return;
+  }
+  const btn=document.getElementById("saveBtn");
+  btn.disabled=true; btn.textContent="جاري الحفظ...";
+  try{
+    const payload={
+      action: editMode ? "update" : "add",
+      oldCode: document.getElementById("oldCode").value,
+      code: norm(document.getElementById("code").value),
+      password: norm(document.getElementById("password").value),
+      name: norm(document.getElementById("name").value),
+      role: norm(document.getElementById("role").value)
+    };
+    const result=await postForm(payload);
+    if(result.result!=="success") throw new Error(result.error || "فشل الحفظ");
+    closeModal();
+    toast(editMode ? "تم تعديل المشرف" : "تمت إضافة المشرف");
+    setTimeout(loadData,700);
+  }catch(err){
+    console.error(err); toast(err.message || "حدث خطأ أثناء الحفظ");
+  }finally{
+    btn.disabled=false; btn.textContent="حفظ";
+  }
+});
+
+async function deleteSupervisor(code,name){
+  if(!confirm(`هل تريد حذف المشرف "${name || code}"؟`)) return;
+  if(API_URL.includes("PUT_YOUR")){ toast("ضع رابط Apps Script داخل API_URL أولاً"); return; }
+  try{
+    const result=await postForm({action:"delete",code});
+    if(result.result!=="success") throw new Error(result.error || "فشل الحذف");
+    toast("تم حذف المشرف");
+    setTimeout(loadData,700);
+  }catch(err){ console.error(err); toast(err.message || "تعذر الحذف"); }
+}
+
+async function postForm(data){
+  const body=new URLSearchParams();
+  Object.entries(data).forEach(([k,v])=>body.append(k,v ?? ""));
+  const res=await fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+    body:body.toString()
+  });
+  const text=await res.text();
+  try{return JSON.parse(text)}
+  catch(_){throw new Error("استجابة Apps Script ليست JSON. تأكد من نشره كتطبيق ويب وتشغيل doPost.");}
+}
+
+function maskPassword(v){
+  if(!v) return "—";
+  return "•".repeat(Math.min(8,Math.max(4,v.length)));
+}
+function escapeHtml(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),2600);
+}
+loadData();
+</script>
+</body>
+</html>

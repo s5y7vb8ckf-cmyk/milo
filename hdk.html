@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - بوابة الإدارة المركزية</title>
+    <!-- استيراد خط Cairo العربي الفخم والرسمي -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- استيراد أيقونات Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;        /* كحلي داكن رسمي */
+            --sky-accent: #0ea5e9;     /* سماوي فخم ونقي */
+            --sky-light: #e0f2fe;      /* خلفية سماوية فاتحة وناعمة */
+            --bg-body: #ffffff;        /* خلفية بيضاء بالكامل */
+            --text-main: #1e293b;      /* النصوص الرئيسية */
+            --text-muted: #64748b;     /* النصوص الفرعية */
+            --border: #cbd5e1;         /* حدود ناعمة وواضحة */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* حاوية التسجيل */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            margin: auto;
+        }
+
+        .login-logo-container {
+            width: 80px;
+            height: 80px;
+            background: var(--sky-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            border: 2px solid rgba(14, 165, 233, 0.2);
+        }
+
+        .login-logo-container span {
+            font-size: 40px;
+            color: var(--sky-accent);
+        }
+
+        .login-header h2 {
+            font-size: 26px;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* زر الاختيار الفخم والرسمي (مشرف / طالب) */
+        .role-selector {
+            display: flex;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .role-btn.active {
+            background: #ffffff;
+            color: var(--sky-accent);
+            box-shadow: 0 4px 12px rgba(14, 165, 233,.15);
+        }
+
+        .login-form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .login-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--primary);
+        }
+
+        .login-control {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            font-size: 14px;
+            background-color: #f8fafc;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .login-control:focus {
+            outline: none;
+            border-color: var(--sky-accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+        }
+
+        .btn-login-submit {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        .btn-login-submit:hover {
+            background-color: var(--sky-accent);
+        }
+
+        .error-msg {
+            background-color: #fef2f2;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-top: 15px;
+            text-align: center;
+            border: 1px solid #fecaca;
+            display: none;
+        }
+
+        .login-footer-text {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+
+             input, textarea, select {
+                font-size: 16px !important;
+       }
+    </style>
+</head>
+<body>
+
+    <div></div>
+
+    <div class="login-container">
+        <div class="login-logo-container">
+            <span class="material-icons-round">admin_panel_settings</span>
+        </div>
+        
+        <div class="login-header">
+            <h2>تسجيل دخول المشرفين</h2>
+            <p>بوابة الإدارة المركزية للاوتك</p>
+        </div>
+
+        <!-- زر اختيار نوع الدخول (مشرف / طالب) -->
+        <div class="role-selector">
+            <button class="role-btn active" onclick="switchRole('supervisor')">مشرف</button>
+            <button class="role-btn" onclick="switchRole('student')">طالب</button>
+        </div>
+        
+        <div class="login-form-group">
+            <label>الكود :</label>
+            <input type="text" id="loginCode" class="login-control" placeholder="الكود":  autocomplete="off">
+        </div>
+        
+        <div class="login-form-group">
+            <label>كلمة السر:</label>
+            <input type="password" id="loginPass" class="login-control" placeholder="••••••••">
+        </div>
+        
+        <button class="btn-login-submit" onclick="handleLogin()">تسجيل الدخول  </button>
+        <div id="loginError" class="error-msg">الكود التعريفي أو كلمة المرور غير صحيحة، أو تعذر الاتصال بالجدول.</div>
+    </div>
+
+    <div class="login-footer-text">
+        جميع الحقوق محفوظة © النظام الإداري اوتك 2026
+    </div>
+
+    <script>
+        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSaCHiKgZZMaf8603SCRHKZs0Y9P4rW1zQG1udijGM24e9t83S41NKbv_DH80HlCeXwRW6IJLfnc7Ps/pub?gid=0&single=true&output=csv';
+
+        function switchRole(role) {
+            if (role === 'student') {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // دالة لتحويل نص الCSV إلى مصفوفة بيانات
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) { // يبدأ من 1 لتخطي عناوين الأعمدة
+                if (!lines[i].trim()) continue;
+                const currentLine = lines[i].split(',').map(item => item.trim().replace(/^["']|["']$/g, ''));
+                if (currentLine.length >= 2) {
+                    result.push({
+                        code: currentLine[0],   // الكود التعريفي
+                        pass: currentLine[1],   // كلمة المرور
+                        name: currentLine[2] || 'مشرف معتمد',
+                        rank: currentLine[3] || 'إداري',
+                        stage: currentLine[4] || 'عام'
+                    });
+                }
+            }
+            return result;
+        }
+
+        async function handleLogin() {
+            const inputCode = document.getElementById('loginCode').value.trim();
+            const inputPass = document.getElementById('loginPass').value.trim();
+            const errorBox = document.getElementById('loginError');
+            errorBox.style.display = 'none';
+
+            if (!inputCode || !inputPass) {
+                errorBox.textContent = "يرجى إدخال الكود التعريفي وكلمة السر.";
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(sheetCSVUrl);
+                const dataText = await response.text();
+                const supervisors = parseCSV(dataText);
+
+                const matched = supervisors.find(s => s.code === inputCode && s.pass === inputPass);
+
+                if (matched) {
+                    localStorage.setItem('currentSupervisor', JSON.stringify(matched));
+                    window.location.href = 'dashboar.html';
+                } else {
+                    errorBox.textContent = "الكود  أو كلمة المرور غير صحيحة.";
+                    errorBox.style.display = 'block';
+                }
+            } catch (error) {
+                errorBox.textContent = "حدث خطأ أثناء الاتصال بجدول البيانات. يرجى المحاولة لاحقاً.";
+                errorBox.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>

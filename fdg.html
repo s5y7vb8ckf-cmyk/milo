@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول ترتيب الدوري الرسمي</title>
+    <!-- استيراد خط Cairo الأنيق -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- استيراد أيقونات Flaticon -->
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-thin-rounded/css/uicons-thin-rounded.css'>
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --primary-sky: #0284c7; /* السماوي الرئيسي الفخم */
+            --sky-light: #f0f9ff;   /* سماوي فاتح جداً للخلفيات */
+            --sky-border: #bae6fd;  /* حدود سماوية ناعمة */
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --gold-color: #d97706;  /* لمعة للمركز الأول */
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- الشريط العلوي (Header) الفخم بتصميم رسمي متكامل --- */
+        .top-navbar {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            padding: 20px 24px;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            z-index: 100;
+        }
+
+        .navbar-main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .top-navbar .badge-sub {
+            background: rgba(255, 255, 255, 0.18);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+        }
+
+        /* كارد معلومات الطالب والمجموعة الرسمي الفخم داخل الشريط العلوي */
+        .student-official-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            padding: 10px 18px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-official-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .student-official-item span {
+            font-weight: 900;
+            color: #fef08a; /* لمسة ذهبية خفيفة لإبراز البيانات رسمياً */
+            letter-spacing: 0.3px;
+        }
+
+        /* --- التخطيط العام للشاشات الكبيرة (توزيع محتوى + قائمة جانبية يمين) --- */
+        .page-layout {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            max-width: 1350px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        /* --- القائمة الجانبية (للابتوب/الشاشات الكبيرة على اليمين) --- */
+        .sidebar-desktop {
+            width: 260px;
+            background: #ffffff;
+            border-left: 1px solid var(--sky-border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.02);
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-muted);
+            padding: 0 12px 8px 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item .nav-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .sidebar-item:hover {
+            background-color: var(--sky-light);
+            color: var(--primary-sky);
+        }
+
+        .sidebar-item.active {
+            background-color: var(--sky-light);
+            color: var(--primary-sky);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+        }
+
+        /* --- المحتوى الرئيسي --- */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 25px 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- قسم اختيار الدوريات الرياضية (فوق الجدول) --- */
+        .leagues-selector-section {
+            background: var(--card-bg);
+            border: 1px solid var(--sky-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .leagues-header-text {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .leagues-sub-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* بطاقة الجدول الرسمية الفخمة */
+        .luxury-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--sky-border);
+            overflow: hidden;
+        }
+
+        /* دعم السحب والتمرير الأفقي بسلاسة تامة في الجوال */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-sky) #f1f5f9;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: var(--primary-sky);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: var(--sky-light);
+            color: var(--primary-sky);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 16px 12px;
+            border-bottom: 2px solid var(--sky-border);
+            letter-spacing: 0.3px;
+        }
+
+        td {
+            padding: 16px 12px;
+            font-size: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+            transition: background 0.2s ease;
+        }
+
+        tr:nth-child(1) {
+            background-color: #f0fdf4; 
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            width: 30px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 14px;
+            background-color: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(1) .rank-badge {
+            background-color: #eab308;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(234, 179, 8, 0.4);
+        }
+
+        tr:nth-child(2) .rank-badge {
+            background-color: #94a3b8;
+            color: #ffffff;
+        }
+
+        tr:nth-child(3) .rank-badge {
+            background-color: #b45309;
+            color: #ffffff;
+        }
+
+        .team-name-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            text-align: right;
+        }
+
+        .team-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .team-text-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-name {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 15px;
+        }
+
+        .team-group-name {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .win-cell { color: #16a34a; font-weight: 700; }
+        .loss-cell { color: #dc2626; font-weight: 700; }
+        .points-col { font-weight: 900; color: var(--primary-sky); font-size: 17px; }
+
+        /* --- الشريط السفلي العائم والمفصول (يظهر في الجوال فقط) --- */
+        .bottom-nav {
+            display: none;
+        }
+
+        /* --- الشريط السفلي العادي (Footer) --- */
+        .bottom-footer {
+            background-color: #ffffff;
+            border-top: 1px solid var(--sky-border);
+            color: var(--text-muted);
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* --- إعدادات التجاوب مع الجوال (شاشات أقل من 768px) --- */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 95px;
+            }
+
+            .sidebar-desktop {
+                display: none;
+            }
+
+            .page-layout {
+                flex-direction: column;
+            }
+
+            .top-navbar {
+                padding: 15px;
+            }
+            .top-navbar h1 {
+                font-size: 17px;
+            }
+            .student-official-card {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .main-wrapper {
+                padding: 15px 10px;
+            }
+            th, td {
+                padding: 12px 10px;
+                font-size: 13.5px;
+            }
+            .bottom-footer {
+                display: none;
+            }
+
+            .bottom-nav {
+                position: fixed;
+                bottom: 16px;
+                left: 16px;
+                right: 16px;
+                max-width: 500px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid var(--sky-border);
+                border-radius: 20px;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 8px 12px;
+                box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15);
+                z-index: 1000;
+                backdrop-filter: blur(12px);
+            }
+
+            .bottom-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                color: var(--text-muted);
+                font-size: 11px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                padding: 8px 12px;
+                border-radius: 14px;
+                flex: 1;
+            }
+
+            .bottom-nav-item .nav-icon {
+                font-size: 20px;
+                line-height: 1;
+                transition: transform 0.2s ease;
+            }
+
+            .bottom-nav-item.active {
+                color: var(--primary-sky);
+                background-color: var(--sky-light);
+                box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+            }
+
+            .bottom-nav-item.active .nav-icon {
+                transform: translateY(-2px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الشريط العلوي الرسمي الفخم مع جلب بيانات الطالب والمجموعة من التسجيل -->
+    <header class="top-navbar">
+        <div class="navbar-main-row">
+            <h1> مرحبا بك </h1>
+            <div class="badge-sub"> نادي اوتك</div>
+        </div>
+        
+        <!-- بطاقة معلومات الطالب والمجموعة الرسمية -->
+        <div class="student-official-card" id="studentCard" style="display: none;">
+            <div class="student-official-item">
+                الطالب: <span id="studentNameDisplay">--</span>
+            </div>
+            <div class="student-official-item">
+                المجموعة: <span id="groupNameDisplay">--</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- هيكل الصفحة الرئيسي (يحتوي على القائمة الجانبية للابتوب والمحتوى بجانبها) -->
+    <div class="page-layout">
+
+        <!-- القائمة الجانبية (تظهر على اللابتوب والشاشات الكبيرة على اليمين فقط) -->
+        <aside class="sidebar-desktop">
+            <div class="sidebar-title">القائمة الرئيسية</div>
+            
+            <div class="sidebar-item active" onclick="switchView('home', this)">
+                <span>الرئيسية</span>
+            </div>
+            
+            <div class="sidebar-item" onclick="switchView('attendance', this)">
+                <span>الحضور والغياب</span>
+            </div>
+            
+            <div class="sidebar-item" onclick="switchView('statement', this)">
+                <span>كشف الحساب</span>
+            </div>
+
+            <div class="sidebar-item" onclick="switchView('settings', this)">
+                <span>الإعدادات</span>
+            </div>
+        </aside>
+
+        <!-- المحتوى -->
+        <div class="main-wrapper">
+            <div class="container">
+                
+                <!-- قسم اختيار الدوريات الرياضية فوق الجدول -->
+                <div class="leagues-selector-section">
+                    <div class="leagues-header-text">الدوريات الرياضية</div>
+                    <div class="leagues-sub-text">اختر دورياً لمشاهدة الترتيب والمباريات</div>
+                </div>
+                
+                <!-- جدول الترتيب -->
+                <div class="luxury-card">
+                    <div class="table-responsive">
+                        <div id="loading" class="loading">جاري التحميل لجلب البيانات من رسيفير اوتك ...</div>
+                        <table id="leagueTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>المركز</th>
+                                    <th style="text-align: right; padding-right: 25px;">الفريق</th>
+                                    <th>المجموعة</th>
+                                    <th>لعب</th>
+                                    <th>فاز</th>
+                                    <th>تعادل</th>
+                                    <th>خسر</th>
+                                    <th>سجل</th>
+                                    <th>عليه</th>
+                                    <th>فارق الأهداف</th>
+                                    <th class="points-col">النقاط</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- يتم تعبئتها تلقائياً -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- الشريط السفلي العائم للجوال -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="bottom-nav-item" style="text-decoration: none;">
+            <span>الرئيسية</span>
+        </a>
+        
+        <a href="dashboard.html" class="bottom-nav-item" style="text-decoration: none;">
+            <span>الحضور</span>
+        </a>
+        
+        <a href="sfj.html" class="bottom-nav-item" style="text-decoration: none;">
+            <span>الحساب</span>
+        </a>
+
+        <a href="fdg.html" class="bottom-nav-item nav-btn-special active" style="text-decoration: none;">
+            <span>الدوري</span>
+        </a>
+        
+        <a href="settings.html" class="bottom-nav-item" style="text-decoration: none;">
+            <span>الإعدادات</span>
+        </a>
+    </div>
+
+    <!-- الشريط السفلي العادي (يظهر على الشاشات الكبيرة الكلاسيكية) -->
+    <footer class="bottom-footer">
+        <span>جميع الحقوق محفوظة © 2026 لنادي اوتك </span>
+        <span style="color: var(--primary-sky);"></span>
+    </footer>
+
+    <script>
+        // دالة جلب بيانات الطالب والمجموعة القادمة من صفحة التسجيل
+        function initStudentData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            let sName = urlParams.get('name') || urlParams.get('student') || localStorage.getItem('studentName');
+            let gName = urlParams.get('group') || urlParams.get('team') || localStorage.getItem('groupName');
+
+            if (sName || gName) {
+                document.getElementById('studentNameDisplay').innerText = sName || 'غير مسجل';
+                document.getElementById('groupNameDisplay').innerText = gName || 'عامة';
+                document.getElementById('studentCard').style.display = 'flex';
+            }
+        }
+
+        initStudentData();
+
+        // دالة موحدة للتنقل بين الأقسام
+        function switchView(viewName, element) {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            if (element.classList.contains('sidebar-item')) {
+                element.classList.add('active');
+                const index = Array.from(document.querySelectorAll('.sidebar-item')).indexOf(element);
+                const mobileItems = document.querySelectorAll('.bottom-nav-item');
+                if (mobileItems[index]) mobileItems[index].classList.add('active');
+            } else {
+                element.classList.add('active');
+                const index = Array.from(document.querySelectorAll('.bottom-nav-item')).indexOf(element);
+                const desktopItems = document.querySelectorAll('.sidebar-item');
+                if (desktopItems[index]) desktopItems[index].classList.add('active');
+            }
+            
+            console.log('تم الانتقال إلى عرض: ' + viewName);
+        }
+
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQFwm9Fst8QF1-dECE3OB0AWsM6A_sd1e6CbK0fI5ZFXR03WybzVTnhgdxx1OfbzAVl4EpNLUOJla6/pub?gid=1928092918&single=true&output=csv';
+
+        async function loadLeagueData() {
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error('فشل في جلب البيانات');
+                
+                const text = await response.text();
+                parseAndRender(text);
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<span style="color:#dc2626;">تعذر تحميل البيانات. تأكد من اتصال الإنترنت وصلاحية الرابط.</span>`;
+                console.error(error);
+            }
+        }
+
+        function parseAndRender(text) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return;
+
+            let rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/^"|"$/g, ''));
+                
+                // مطابقة الترتيب حسب الأعمدة (المجموعة، الفريق، اللون، لعب، فاز، تعادل، خسر، له، عليه)
+                let groupName = cols[0] || ''; 
+                let teamName = cols[1] || '';  
+                let color = cols[2] || '#0284c7';     
+                let played = parseInt(cols[3]) || 0;
+                let won = parseInt(cols[4]) || 0;
+                let drawn = parseInt(cols[5]) || 0;
+                let lost = parseInt(cols[6]) || 0;
+                let gf = parseInt(cols[7]) || 0; 
+                let ga = parseInt(cols[8]) || 0; 
+
+                // حساب النقاط بناءً على الطلب (الفوز = 1، التعادل = 1، الخسارة = 0)
+                let calculatedPoints = (won * 1) + (drawn * 1) + (lost * 0);
+                let goalDifference = gf - ga;
+
+                rows.push({
+                    group: groupName,    
+                    team: teamName,    
+                    color: color,    
+                    played: played,   
+                    won: won,          
+                    drawn: drawn,      
+                    lost: lost,        
+                    gf: gf,        
+                    ga: ga,        
+                    points: calculatedPoints,
+                    gd: goalDifference
+                });
+            }
+
+            // ترتيب الفرق تنازلياً حسب النقاط ثم بفارق الأهداف
+            rows.sort((a, b) => {
+                if (b.points !== a.points) {
+                    return b.points - a.points; 
+                }
+                return b.gd - a.gd; 
+            });
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            rows.forEach((t, index) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="rank-badge">${index + 1}</span></td>
+                    <td style="text-align: right; padding-right: 25px;">
+                        <div class="team-name-cell">
+                            <span class="team-dot" style="background-color: ${t.color};"></span>
+                            <span class="team-name">${t.team}</span>
+                        </div>
+                    </td>
+                    <td><span class="team-group-name" style="font-size: 13px; font-weight: 600;">${t.group}</span></td>
+                    <td>${t.played}</td>
+                    <td class="win-cell">${t.won}</td>
+                    <td>${t.drawn}</td>
+                    <td class="loss-cell">${t.lost}</td>
+                    <td>${t.gf}</td>
+                    <td>${t.ga}</td>
+                    <td style="font-weight: 700; color: ${t.gd > 0 ? '#16a34a' : (t.gd < 0 ? '#dc2626' : '#64748b')};">${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+                    <td class="points-col">${t.points}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('leagueTable').style.display = 'table';
+        }
+
+        loadLeagueData();
+    </script>
+</body>
+</html>
